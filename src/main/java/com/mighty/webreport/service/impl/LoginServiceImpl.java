@@ -4,7 +4,8 @@ import com.mighty.webreport.domain.dto.AuthenticationDto;
 import com.mighty.webreport.domain.dto.MenuResponse;
 import com.mighty.webreport.domain.entity.admin.Member;
 import com.mighty.webreport.domain.entity.idclass.MenuGroupId;
-import com.mighty.webreport.domain.entity.system.MenuGroup;
+import com.mighty.webreport.domain.entity.system.MenuGroup;;
+import com.mighty.webreport.repository.jdbcrepository.MenuJDBCRepositoryCustom;
 import com.mighty.webreport.repository.jparepository.MenuGroupRepository;
 import com.mighty.webreport.repository.querydsl.MenuRepositoryCustom;
 import com.mighty.webreport.security.AccountContext;
@@ -33,6 +34,10 @@ public class LoginServiceImpl implements LoginService {
     private final MenuGroupRepository menuGroupRepository;
 
     private final MenuRepositoryCustom menuRepositoryCustom;
+
+    private final MenuJDBCRepositoryCustom menuJDBCRepositoryCustom;
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -66,7 +71,8 @@ public class LoginServiceImpl implements LoginService {
             return hashMap;
         }
 
-        List<MenuResponse> menus = setMenuDepth(menuRepositoryCustom.getMenu(accountContext.getPlant()));
+//        List<MenuResponse> menus = setMenuDepth(menuRepositoryCustom.getMenu(accountContext.getPlant()));
+        List<MenuResponse> menus = setMenuDepth(menuJDBCRepositoryCustom.getMenu(accountContext.getPlant()));
         String jwt = "Bearer " + provider.createToken(authentication);
 
         hashMap.put("isAuth",true);
@@ -82,7 +88,13 @@ public class LoginServiceImpl implements LoginService {
                 menus.get(i).setChild(new ArrayList<>());
                 newMenus.add(menus.get(i));
             }else{
-                newMenus.get(newMenus.size()-1).getChild().add(menus.get(i));
+                //CHILD 레벨의 메뉴가 먼저 노출되는 경우 패스(기준정보에서 상위메뉴만 hide 처리 했을 경우
+                if(newMenus.size() ==0) {
+                    continue;
+                }
+                if(menus.get(i).getMenuId().substring(0,2).equals(newMenus.get(newMenus.size()-1).getMenuId())){
+                    newMenus.get(newMenus.size()-1).getChild().add(menus.get(i));
+                }
             }
         }
         return newMenus;

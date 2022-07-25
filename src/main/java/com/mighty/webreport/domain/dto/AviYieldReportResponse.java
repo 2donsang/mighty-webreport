@@ -6,12 +6,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DeviceResponse {
+public class AviYieldReportResponse {
 
-    private String deviceId;
+    private String operation;
 
-    private String description;
+    private String lotNumber;
 
-    private String customer;
-
+    private String mainLot;
 }

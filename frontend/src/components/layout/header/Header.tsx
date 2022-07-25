@@ -25,7 +25,7 @@ const Header = () => {
                     ?
                     (<div className='nav-container'>
                         <div className='logout-container'>
-                            <DarkToggle />
+                            {/* <DarkToggle /> */}
                             <Language />
                             <LogoutBtn />
                         </div>

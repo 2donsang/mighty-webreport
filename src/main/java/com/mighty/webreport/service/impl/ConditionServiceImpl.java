@@ -1,9 +1,6 @@
 package com.mighty.webreport.service.impl;
 
-import com.mighty.webreport.domain.dto.CustomerDto;
-import com.mighty.webreport.domain.dto.DeviceResponse;
-import com.mighty.webreport.domain.dto.LotNumberResponse;
-import com.mighty.webreport.domain.dto.OperationResponse;
+import com.mighty.webreport.domain.dto.*;
 import com.mighty.webreport.domain.entity.admin.Customer;
 import com.mighty.webreport.repository.jdbcrepository.JDBCExampleRepository;
 import com.mighty.webreport.repository.jdbcrepository.LotStatusJDBCRepository;
@@ -72,4 +69,5 @@ public class ConditionServiceImpl implements ConditionService {
         List<LotNumberResponse> lotNumbers =lotStatusJDBCRepository.getLotNumbers(plant);
         hashMap.put("lotNumbers",lotNumbers);
     }
+
 }

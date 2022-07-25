@@ -11,4 +11,5 @@ public interface ConditionService {
     public void getDevicesWithCustomers( HashMap<String,Object> hashMap , String plant);
 
     public void getLotNumbers( HashMap<String,Object> hashMap, String plant);
+
 }

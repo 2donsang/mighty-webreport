@@ -9,15 +9,19 @@ import AVIYield from "../../../pages/yield/AVIYield";
 import PTESTYield from "../../../pages/yield/PTESTYield";
 import FinalPTESTYield from "../../../pages/yield/FinalPTESTYield";
 import MonthlySalesPerformance from "../../../pages/sales/MonthlySalesPerformance";
-import {setTabList} from "../../../modules/action/tabMenuAction";
+import {setTabList, focusTabList} from "../../../modules/action/tabMenuAction";
 import ViewDefectStatus from "../../../pages/inventory/ViewDefectStatus";
 import DailyMovement from '../../../pages/product/DailyMovement';
+import LotStatusNew from '../../../pages/inventory/LotStatusNew';
+import TotalYield from '../../../pages/yield/TotalYield';
+import DailyWipTrend from '../../../pages/inventory/DailyWipTrend';
 
 type menuName = string | "Daily Movement" | "Operation Movement Monitoring" |
-    "Daily Shipping Status" | "Fab Out Status By Device" | "View LOT Status" |
+    "Daily Shipping Status" | "Fab Out Status By Device" | "View LOT Status"|
     "AVI Yield Report" | "PTEST Yield Report" | "Final PTEST Yield Report" |
     "Current Month Sales Status" | "View Defect Status" |
-    "TEST";
+    "TEST"|  "View LOT Status(VLST)" | "Total Yield Report" | "DailyWipTrend";
+     
 
 const MenuSet: Record<menuName, ITab> = {
     "Daily Movement" : {
@@ -74,7 +78,23 @@ const MenuSet: Record<menuName, ITab> = {
         label : "TEST",
         labelKor : "테스트",
         children : <LotStatus />
+    },
+    "View LOT Status(VLST)" : {
+        label : "View LOT Status(VLST)",
+        labelKor : "LOT 정보 보회(VLST)",
+        children : <LotStatusNew />
+    },
+    "Total Yield Report" : {
+        label : "Total Yield Report",
+        labelKor : "전체 Yield Report",
+        children : <TotalYield />
+    },
+    "DailyWipTrend" : {
+        label : "DailyWipTrend",
+        labelKor : "일자별 재공 추이도",
+        children : <DailyWipTrend />
     }
+    
 }
 
 interface IProps {

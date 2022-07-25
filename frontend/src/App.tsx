@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Profiler, ProfilerOnRenderCallback } from 'react';
 import Routing from "./router/Routing";
 import GlobalStyle from "./styles/GlobalStyle";
 import Footer from "./components/layout/footer/Footer";
@@ -9,7 +9,7 @@ import {RootState} from "./modules";
 
 function App() {
     const alertState = useSelector((state:RootState)=>state.alertReducer);
-
+  
     return (
       <div className="App">
           <GlobalStyle />

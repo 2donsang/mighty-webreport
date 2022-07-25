@@ -25,7 +25,6 @@ ApiUtil.interceptors.request.use(
         if(config.headers !== undefined){
             const token = localStorage.getItem('auth-token');
             if(token===null || token === undefined){
-                alert("시발");
                 window.location.href="/login";
                 config.headers.Authorization = "";
             }else{

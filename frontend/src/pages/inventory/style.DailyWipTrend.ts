@@ -10,19 +10,14 @@ export const Container = styled.div<{isLookDown:boolean}>`
             flex-direction : column;
             .condition_container{               
                 display : grid;
-                  grid-template-columns : repeat(4, 1fr);
+                grid-template-columns : repeat(4, 1fr);
                 //gap: 20px 20px;
                 div:nth-child(3){
                     grid-column: 3/5;
                     grid-row : 1/2;
                 }
             }
-            .container{
-                display : grid;
-                grid-template-columns : repeat(4, 1fr);
-                
-            }
-        }`
+        }`   
         :
         `form{
             display : flex;
@@ -37,6 +32,29 @@ export const Container = styled.div<{isLookDown:boolean}>`
                 }
             }     
         }`
-        
+    }
+
+    .chart-container{
+        ${(props) => props.isLookDown ?
+            `padding-top: 20px` 
+            : 
+            `padding-left: 20px` };
+        .chart-menu{
+        text-align: right;
+        margin-right: 22px;
+        svg {
+            cursor: pointer;
+        }
+        svg:hover {
+            opacity: 0.7;
+        }
+        }
+        .charts {
+        display: flex;
+        flex-direction: ${(props) => props.isLookDown ?`column` : `row` };
+        justify-content: space-between;
+        align-items : center;
+        width : auto;
+        }  
     }
 `;

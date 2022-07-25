@@ -3,7 +3,7 @@ import color from "../../styles/color";
 
 export const Container = styled.div`
   border: 1px solid ${color.lightgray};
-  resize: horizontal;
+  //resize: horizontal;
   position: relative;
   margin-right: 10px;
   margin-bottom: 10px;
@@ -13,8 +13,8 @@ export const Container = styled.div`
   min-width: 230px;
   border-radius: 10px;
   .header{
-    font-size : 1.3rem;
-    margin-bottom: 10px;
+    font-size : 1.1rem;
+    margin-bottom: 5px;
   }
   .change-container{
     cursor: pointer;
@@ -36,7 +36,7 @@ export const Container = styled.div`
   }
   .search-box{
     position: relative;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
     input{
       padding: 0 20px;
       border: 2px solid ${color.lightgray};
@@ -97,7 +97,7 @@ export const Container = styled.div`
   .selected-list{
     border: 2px solid ${color.lightgray};
     border-radius: 10px;
-    height: 120px;
+    height: 60px;
     width: 100%;
     overflow-y: auto;
     list-style-position:inside;
@@ -116,4 +116,5 @@ export const Container = styled.div`
       color: #ea3847;
     }
   }
+
 `;

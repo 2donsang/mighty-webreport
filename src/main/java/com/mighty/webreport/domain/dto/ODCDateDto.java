@@ -1,29 +1,30 @@
 package com.mighty.webreport.domain.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Setter @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class CDODto {
+public class ODCDateDto {
 
-    private List<IdTextDto> customers;
+
+    private DateDto dates;
 
     private List<IdTextDto> operations;
 
     private List<IdTextDto> devices;
 
-    public String getCustomersString(){
-        if(customers == null){
-            return "";
-        }
-        if(customers.size() ==0){
-            return "";
-        }
+    private List<IdTextDto> customers;
 
+    public String getCustomersString(){
+        if(customers.size()==0){
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<customers.size(); i++){
             sb.append("'");
@@ -70,5 +71,4 @@ public class CDODto {
         }
         return sb.toString();
     }
-
 }

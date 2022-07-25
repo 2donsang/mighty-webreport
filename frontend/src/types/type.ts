@@ -32,3 +32,8 @@ export interface IAlert {
     callback?: CallbackFunction;
 }
 
+export interface INaturalDate {
+    naturalDate : string;
+}
+
+

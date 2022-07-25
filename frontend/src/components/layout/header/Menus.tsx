@@ -10,6 +10,7 @@ const Menus = () => {
     const langState = useSelector((state:RootState) => state.langReducer);
 
     useEffect(()=>{
+        console.log(JSON.parse(localStorage.getItem("menus") || ""));
         setMenus(JSON.parse(localStorage.getItem("menus") || ""));
     },[]);
 

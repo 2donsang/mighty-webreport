@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,4 +73,28 @@ public class SearchServiceImpl implements SearchService {
 
         hashMap.put("defectStatus",defectStatus);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void getMovementStatus(HashMap<String, Object> hashMap, ODCDateDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountContext accountContext = (AccountContext) authentication.getPrincipal();
+        String startDay = dto.getDates().getStartDate().substring(0,8);
+        String endDay = dto.getDates().getEndDate().substring(0,8);
+
+
+        List<MovementResponse> movementStatus = lbrHistoryRepository.getMovementStatus(
+                accountContext.getPlant(),
+                dto.getDates().getStartDate(),
+                dto.getDates().getEndDate(),
+                startDay,
+                endDay,
+                dto.getOperationsString(),
+                dto.getDevicesString(),
+                dto.getCustomersString(),
+                accountContext.getId()
+        );
+        hashMap.put("movementStatus",movementStatus);
+    }
+
 }

@@ -25,14 +25,15 @@ const createHeaders = (headers:TableHeader[]) => {
 
 const Table = ({ headers , bodies ,isViewAll , isLookDown }:IProps) => {
 
+    console.log(headers);
     const [tableHeight,setTableHeight] = useState("auto");
     const [activeIndex,setActiveIndex] = useState(-1);
     const tableElement = useRef<HTMLTableElement>(null);
     const columns:Headers[] = createHeaders(headers);
     const minCellWidth:number = 22;
 
+    //debugger
     const bodiesMemo = useMemo(()=> {return bodies}, [bodies]);
-
     const mouseDown = (index:number) => {
       setActiveIndex(index);
     };

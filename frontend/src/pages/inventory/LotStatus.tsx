@@ -91,6 +91,7 @@ const LotStatus = () => {
             if(res.data.lotStatus.length === 0){
                 dispatch(showAlertModal("확인 메세지","데이터","가 없습니다."));
             }
+            console.log(res.data.lotStatus);
             setSearchData(res.data.lotStatus);
         }
         callAPI();

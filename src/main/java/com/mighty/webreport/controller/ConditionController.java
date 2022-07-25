@@ -2,6 +2,7 @@ package com.mighty.webreport.controller;
 
 import com.mighty.webreport.security.AccountContext;
 import com.mighty.webreport.service.ConditionService;
+import com.mighty.webreport.service.JDBCExampleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 public class ConditionController {
 
     private final ConditionService conditionService;
+
+    private final JDBCExampleService  jdbcExampleService;
 
     @GetMapping("/customerAndOperationAndDevice")
     public ResponseEntity<?> getCustomerAndOperationAndDevice(){
@@ -38,6 +41,20 @@ public class ConditionController {
         conditionService.getOperations(hashMap,accountContext.getPlant());
         conditionService.getDevices(hashMap, accountContext.getPlant());
         conditionService.getLotNumbers(hashMap, accountContext.getPlant());
+        return ResponseEntity.ok(hashMap);
+    }
+
+    @GetMapping("/deviceAndLotNumberAndOperation")
+    public ResponseEntity<?> getDeviceAndLotNumberAndOperation(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountContext accountContext = (AccountContext) authentication.getPrincipal();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        //conditionService.getDevices(hashMap, accountContext.getPlant());
+        jdbcExampleService.getDevices(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix());
+        //conditionService.getLotNumbers(hashMap, accountContext.getPlant());
+        jdbcExampleService.getLotNumbers(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix());
+        conditionService.getOperations(hashMap, accountContext.getPlant());
+
         return ResponseEntity.ok(hashMap);
     }
 

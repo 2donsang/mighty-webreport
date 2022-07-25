@@ -1,8 +1,9 @@
 import * as S from './style.Tab';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../modules";
-import {setTabList} from "../../modules/action/tabMenuAction";
+import {setTabList, focusTabList} from "../../modules/action/tabMenuAction";
 import {MouseEventFunction} from "../../types/type";
+
 
 interface IProps {
     selected : boolean;
@@ -16,7 +17,6 @@ const Tab = ({selected , label , labelKor , onClick}:IProps) => {
     const tabList = useSelector((state:RootState)=>state.tabMenuReducer);
     const langState = useSelector((state:RootState) => state.langReducer);
     const dispatch = useDispatch();
-
     const onDelete = (event:React.MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
         const index = tabList.findIndex((element)=>element.label === label);
