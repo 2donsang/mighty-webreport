@@ -10,6 +10,11 @@ public interface ConditionService {
 
     public void getDevicesWithCustomers( HashMap<String,Object> hashMap , String plant);
 
+    public void getOperationsNew(HashMap<String,Object> hashMap, String plant);
+
     public void getLotNumbers( HashMap<String,Object> hashMap, String plant);
 
+    public void getAVIOperations(HashMap<String,Object> hashMap, String plant);
+
+    void getProbeOperations(HashMap<String, Object> hashMap, String plant);
 }

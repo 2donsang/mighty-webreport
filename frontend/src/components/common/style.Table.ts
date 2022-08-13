@@ -92,5 +92,8 @@ export const Container = styled.div<{headers:TableHeader[] , isViewAll:boolean ,
   .td-operation{
     background: ${color.lavender} !important;
   }
+  .td-total{
+    background: ${color.gray} !important;
+  }
   
 `;

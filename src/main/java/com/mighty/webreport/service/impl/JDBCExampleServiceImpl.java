@@ -6,20 +6,12 @@ import com.mighty.webreport.security.AccountContext;
 import com.mighty.webreport.service.JDBCExampleService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.catalina.core.ApplicationContext;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Security;
-import java.sql.Array;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -34,7 +26,6 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountContext accountContext = (AccountContext) authentication.getPrincipal();
         List<LotStatusResponse> lotStatus = new ArrayList<>();
-        if (accountContext.getMember().getExpandFieldSix() != null) {
 
             List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
             String startDate = dateList.get(0);
@@ -44,21 +35,21 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
                     dto.getOperationsString(),
                     dto.getDevicesString(),
                     startDate,
-                    endDate);
-        }
+                    endDate,
+                    accountContext.getMember().getExternalFlag());
         hashMap.put("lotStatus", lotStatus);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public void getDevices(HashMap<String, Object> hashMap, String plant, String customer) {
-        List<DeviceResponse> devices = jdbcExampleRepository.getDevices(plant, customer);
+    public void getDevices(HashMap<String, Object> hashMap, String plant, String customer, String externalFlag) {
+        List<DeviceResponse> devices = jdbcExampleRepository.getDevices(plant, customer, externalFlag);
         hashMap.put("devices", devices);
     }
 
     @Override
-    public void getLotNumbers(HashMap<String, Object> hashMap, String plant, String customer) {
-        List<LotNumberResponse> lotNumbers = jdbcExampleRepository.getLotNumbers(plant, customer);
+    public void getLotNumbers(HashMap<String, Object> hashMap, String plant, String customer, String externalFlag) {
+        List<LotNumberResponse> lotNumbers = jdbcExampleRepository.getLotNumbers(plant, customer, externalFlag);
         hashMap.put("lotNumbers", lotNumbers);
     }
 
@@ -73,15 +64,65 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
             List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
             String startDate = dateList.get(0);
             String endDate = dateList.get(1);
-            aviYieldReport = jdbcExampleRepository.getAviYieldReport(accountContext.getPlant(), accountContext.getMember().getExpandFieldSix(),
-                    dto.getLotNumbersString(),
-                    dto.getOperationsString(),
-                    dto.getDevicesString(),
-                    startDate,
-                    endDate);
+            String customer = "'" +  accountContext.getMember().getExpandFieldSix()+"'" ;
+
+            aviYieldReport = jdbcExampleRepository.getAviYieldReport(accountContext.getPlant(), customer, dto.getLotNumbersString(),
+                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate,
+                    "False", "", "False", "", "");
         }
 
         hashMap.put("aviYieldReport", aviYieldReport);
+    }
+
+
+    @Override
+    public void getAviYieldReportNew(HashMap<String, Object> hashMap, DLODateDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountContext accountContext = (AccountContext) authentication.getPrincipal();
+        List<AviYieldReportResponse> aviYieldReport = new ArrayList<>();
+
+            List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
+            String startDate = dateList.get(0);
+            String endDate = dateList.get(1);
+            String customer = accountContext.getMember().getExpandFieldSix() ;
+
+            aviYieldReport = jdbcExampleRepository.getAviYieldReportNew(accountContext.getPlant(), customer, dto.getLotNumbersString(),
+                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate, accountContext.getMember().getExternalFlag());
+
+        hashMap.put("aviYieldReport", aviYieldReport);
+    }
+    @Override
+    public void getProbeYieldReport(HashMap<String, Object> hashMap, DLODateDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountContext accountContext = (AccountContext) authentication.getPrincipal();
+        List<ProbeYieldReportResponse> probeYieldReport = new ArrayList<>();
+
+            List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
+            String startDate = dateList.get(0);
+            String endDate = dateList.get(1);
+            String customer = accountContext.getMember().getExpandFieldSix();
+
+
+            probeYieldReport = jdbcExampleRepository.getProbeYieldReport(accountContext.getPlant(), customer, dto.getLotNumbersString(),
+                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate, accountContext.getMember().getExternalFlag());
+
+        hashMap.put("probeYieldReport", probeYieldReport);
+    }
+    @Override
+    public void getTotalYieldReportNew(HashMap<String, Object> hashMap, DLODateDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountContext accountContext = (AccountContext) authentication.getPrincipal();
+        List<TotalYieldReportResponse> totalYieldReport = new ArrayList<>();
+
+            List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
+            String startDate = dateList.get(0);
+            String endDate = dateList.get(1);
+            String customer = accountContext.getMember().getExpandFieldSix();
+
+            totalYieldReport = jdbcExampleRepository.getTotalYieldReport(accountContext.getPlant(), customer, dto.getLotNumbersString(),
+                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate, accountContext.getMember().getExternalFlag());
+
+        hashMap.put("totalYieldReport", totalYieldReport);
     }
 
     @Override
@@ -116,7 +157,6 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountContext accountContext = (AccountContext)authentication.getPrincipal();
         List<DailyWipTrendResponse> dailyWipTrend = new ArrayList<>();
-        if (accountContext.getMember().getExpandFieldSix() != null) {
 
         String selectedDate = dto.getDates().getStartDate();
         int year = Integer.parseInt(selectedDate.substring(0, 4));
@@ -135,22 +175,22 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
         String endDate2 = simpleDateFormat.format(calendar.getTime());
         System.out.println(endDate2);
 
-//        String customer =  "'" + accountContext.getMember().getExpandFieldSix() + "'";
-          String customer = "";
+        String customer =  "'"+accountContext.getMember().getExpandFieldSix()+"'";
+
         dailyWipTrend = jdbcExampleRepository.getDailyWipTrend(accountContext.getPlant(),customer,
                 dto.getLotNumbersString(),
                 dto.getOperationsString(),
                 dto.getDevicesString(),
                 startDate,
-                endDate, endDate2);
-        }
+                endDate, endDate2,
+                accountContext.getMember().getExternalFlag()
+                );
 
         hashMap.put("dailyWipTrend", dailyWipTrend);
     }
 
     public List<String> transStartDate(String startDate, String endDate) {
         List<String> dateList = new ArrayList<>();
-
         String transStartDate = startDate.substring(0, 8) + "070000";
         String transEndDate = endDate.substring(0, 8) + "070000";
         dateList.add(transStartDate);

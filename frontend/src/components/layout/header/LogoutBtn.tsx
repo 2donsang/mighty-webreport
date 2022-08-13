@@ -15,7 +15,7 @@ const LogoutBtn = () => {
         navigate("/login");
     }
 
-    const Logout = () => (<Icon icon="logout" size={20} />);
+    const Logout = () => (<Icon icon="logout" size={25} />);
 
     return (
         <S.Container onClick={onClick}>

@@ -16,7 +16,7 @@ import { getRGBA } from '../../utils/RGBAUtil';
 import * as S from './style.DailyWipTrend';
 
 const tableHeaders: TableHeader[] = [
-    { text: "Operation", width: "130px" },
+    // { text: "Operation", width: "130px" },
     { text: "공정", width: "130px" },
     { text: "1일", width: "80px" },
     { text: "2일", width: "80px" },
@@ -53,13 +53,40 @@ const tableHeaders: TableHeader[] = [
 
 
 const CSVHeaders: CSVHeader[] = [
-    { label: "제품", key: "device" },
-    { label: "공정", key: "operation" },
-    { label: "LOT_Number", key: "lotNumber" },
-    { label: `4"_M1 Scratch`, key: "m1Scratch" },
-    { label: `6"_Crack`, key: "crack" },
-    { label: `6"_Chip`, key: "chip" },
-    { label: `6"_Scratch`, key: "scratch" },
+    { label: "Operation", key: "operation" },
+    { label: "공정", key: "operationDesc" },
+    { label: "1일", key: "day1" },
+    { label: "2일", key: "day2" },
+    { label: "3일", key: "day3" },
+    { label: "4일", key: "day4" },
+    { label: "5일", key: "day5" },
+    { label: "6일", key: "day6" },
+    { label: "7일", key: "day7" },
+    { label: "8일", key: "day8" },
+    { label: "9일", key: "day9" },
+    { label: "10일", key: "day10" },
+    { label: "11일", key: "day11" },
+    { label: "12일", key: "day12" },
+    { label: "13일", key: "day13" },
+    { label: "14일", key: "day14" },
+    { label: "15일", key: "day15" },
+    { label: "16일", key: "day16" },
+    { label: "17일", key: "day17" },
+    { label: "18일", key: "day18" },
+    { label: "19일", key: "day19" },
+    { label: "20일", key: "day20" },
+    { label: "21일", key: "day21" },
+    { label: "22일", key: "day22" },
+    { label: "23일", key: "day23" },
+    { label: "24일", key: "day24" },
+    { label: "25일", key: "day25" },
+    { label: "26일", key: "day26" },
+    { label: "27일", key: "day27" },
+    { label: "28일", key: "day28" },
+    { label: "29일", key: "day29" },
+    { label: "30일", key: "day30" },
+    { label: "31일", key: "day31" },
+
 ];
 
 interface IDefectStatus {
@@ -78,16 +105,16 @@ interface IDefectStatus {
 
 interface IDailyWipTrend {
     operation: string; operationDesc: string;
-    day1:number; day11:number; day21:number;
-    day2:number; day12:number; day22:number;
-    day3:number; day13:number; day23:number;
-    day4:number; day14:number; day24:number;
-    day5:number; day15:number; day25:number;
-    day6:number; day16:number; day26:number;
-    day7:number; day17:number; day27:number;
-    day8:number; day18:number; day28:number;
-    day9:number; day19:number; day29:number;
-    day10:number; day20:number; day30:number; day31:number;
+    day1:string; day11:string; day21:string;
+    day2:string; day12:string; day22:string;
+    day3:string; day13:string; day23:string;
+    day4:string; day14:string; day24:string;
+    day5:string; day15:string; day25:string;
+    day6:string; day16:string; day26:string;
+    day7:string; day17:string; day27:string;
+    day8:string; day18:string; day28:string;
+    day9:string; day19:string; day29:string;
+    day10:string; day20:string; day30:string; day31:string;
 
 }
 
@@ -97,6 +124,7 @@ const dailyLabels: string[] = [];
 
 const DailyWipTrend = () => {
     const langState = useSelector((state: RootState) => state.langReducer);
+    console.log(langState.isKor);
     // 제품, LOT 번호, 공정, LOT Status
     const [isLookDown, setIsLookDown] = useState(true);
     const [devices, setDevices] = useState<ISearchBox[]>([]);
@@ -229,13 +257,38 @@ const DailyWipTrend = () => {
             console.log(searchData);
             dailyWipTrend.push({
                 label: element.operationDesc,
-                data: [element.day1, element.day2, element.day3, element.day4, element.day5,
-                element.day6, element.day7, element.day8, element.day9, element.day10,
-                element.day11, element.day12, element.day13, element.day14, element.day15,
-                element.day16, element.day17, element.day18, element.day19, element.day20,
-                element.day21, element.day22, element.day23, element.day24, element.day25,
-                element.day26, element.day27, element.day28, element.day29, element.day30,
-                element.day31],
+                data: [
+                    +element.day1, 
+                    +element.day2, 
+                    +element.day3, 
+                    +element.day4, 
+                    +element.day5,
+                    +element.day6, 
+                    +element.day7, 
+                    +element.day8,
+                    +element.day9, 
+                    +element.day10,
+                    +element.day11, 
+                    +element.day12, 
+                    +element.day13, 
+                    +element.day14, 
+                    +element.day15,
+                    +element.day16, 
+                    +element.day17, 
+                    +element.day18, 
+                    +element.day19, 
+                    +element.day20,
+                    +element.day21, 
+                    +element.day22, 
+                    +element.day23, 
+                    +element.day24, 
+                    +element.day25,
+                    +element.day26, 
+                    +element.day27, 
+                    +element.day28, 
+                    +element.day29, 
+                    +element.day30,
+                    +element.day31,],
                 backgroundColor: getRGBA(index + 4)
             })
         });
@@ -272,7 +325,6 @@ const DailyWipTrend = () => {
         let day29:number = 0;
         let day30:number = 0;
         let day31:number = 0;
-        let days: number[] = [];
 
         searchData.map((array, index) => {
             day1 += Number(array.day1);
@@ -310,39 +362,74 @@ const DailyWipTrend = () => {
         searchData.splice(0, 0, {
             operation: "",
             operationDesc: "Total",
-            day1: day1,
-            day2: day2,
-            day3: day3,
-            day4: day4,
-            day5: day6,
-            day6: day7,
-            day7: day8,
-            day8: day9,
-            day9: day9,
-            day10: day10,
-            day11: day11,
-            day12: day12,
-            day13: day13,
-            day14: day14,
-            day15: day15,
-            day16: day16,
-            day17: day17,
-            day18: day18,
-            day19: day19,
-            day20: day20,
-            day21: day21,
-            day22: day22,
-            day23: day23,
-            day24: day24,
-            day25: day25,
-            day26: day26,
-            day27: day27,
-            day28: day28,
-            day29: day29,
-            day30: day30,
-            day31: day31,
+            day1: day1.toString(),
+            day2: day2.toString(),
+            day3: day3.toString(),
+            day4: day4.toString(),
+            day5: day6.toString(),
+            day6: day7.toString(),
+            day7: day8.toString(),
+            day8: day9.toString(),
+            day9: day9.toString(),
+            day10: day10.toString(),
+            day11: day11.toString(),
+            day12: day12.toString(),
+            day13: day13.toString(),
+            day14: day14.toString(),
+            day15: day15.toString(),
+            day16: day16.toString(),
+            day17: day17.toString(),
+            day18: day18.toString(),
+            day19: day19.toString(),
+            day20: day20.toString(),
+            day21: day21.toString(),
+            day22: day22.toString(),
+            day23: day23.toString(),
+            day24: day24.toString(),
+            day25: day25.toString(),
+            day26: day26.toString(),
+            day27: day27.toString(),
+            day28: day28.toString(),
+            day29: day29.toString(),
+            day30: day30.toString(),
+            day31: day31.toString(),
         })
 
+        //1000자리 구분자 넣기
+        searchData.map((element,index) =>{
+            element.day1 = (+element.day1).toLocaleString();
+            element.day2 = (+element.day2).toLocaleString();
+            element.day3 = (+element.day3).toLocaleString();
+            element.day4 = (+element.day4).toLocaleString();
+            element.day5 = (+element.day5).toLocaleString();
+            element.day6 = (+element.day6).toLocaleString();
+            element.day7 = (+element.day7).toLocaleString();
+            element.day8 = (+element.day8).toLocaleString();
+            element.day9 = (+element.day9).toLocaleString();
+            element.day10 = (+element.day10).toLocaleString();
+            element.day11 = (+element.day11).toLocaleString();
+            element.day12 = (+element.day12).toLocaleString();
+            element.day13 = (+element.day13).toLocaleString();
+            element.day14 = (+element.day14).toLocaleString();
+            element.day15 = (+element.day15).toLocaleString();
+            element.day16 = (+element.day16).toLocaleString();
+            element.day17 = (+element.day17).toLocaleString();
+            element.day18 = (+element.day18).toLocaleString();
+            element.day19 = (+element.day19).toLocaleString();
+            element.day20 = (+element.day20).toLocaleString();
+            element.day21 = (+element.day21).toLocaleString();
+            element.day22 = (+element.day22).toLocaleString();
+            element.day23 = (+element.day23).toLocaleString();
+            element.day24 = (+element.day24).toLocaleString();
+            element.day25 = (+element.day25).toLocaleString();
+            element.day26 = (+element.day26).toLocaleString();
+            element.day27 = (+element.day27).toLocaleString();
+            element.day28 = (+element.day28).toLocaleString();
+            element.day29 = (+element.day29).toLocaleString();
+            element.day30 = (+element.day30).toLocaleString();
+            element.day31 = (+element.day31).toLocaleString();
+            
+        })
 
         setTableBodies((
             <tbody
@@ -353,7 +440,7 @@ const DailyWipTrend = () => {
                         key={"body" + index}
                     >
                         <tr>
-                            <td><span>{element.operation}</span></td>
+                            {/* <td><span>{element.operation}</span></td> */}
                             <td><span>{element.operationDesc}</span></td>
                             <td><span>{element.day1}</span></td>
                             <td><span>{element.day2}</span></td>
@@ -401,47 +488,49 @@ const DailyWipTrend = () => {
     return (
         <S.Container isLookDown={isLookDown} >
             <form onSubmit={onSubmit}>
-                <div className='condition_container'>
-                    <SearchSelector
-                        title={langState.isKor ? "제품" : "Device"}
-                        list={devices}
-                        selected={checkedDevices}
-                        selector={setCheckedDevices}
-                    />
-                    {/* 제품, LOT 번호, 공정, LOT Status */}
-                    <SearchSelector
-                        title={langState.isKor ? "LOT번호" : "LOT Numbers"}
-                        list={lotNumbers}
-                        selected={checkedLotNumbers}
-                        selector={setCheckedLotNumbers}
-                    />
-                    <SearchSelector
-                        title={langState.isKor ? "공정" : "Operation"}
-                        list={operations}
-                        selected={checkedOperations}
-                        selector={setCheckedOperations}
-                    />
-                </div>
-                <div className="chart-container">
-                    <div className="charts">
-                        <StackedBar
-                            title="일별 재공 추이도"
-                            labels={dailyLabels}
-                            datasets={dailyWipTrend}
+                <div className='condition_chart'>
+                    <div className='condition_container'>
+                        <SearchSelector
+                            title={langState.isKor ? "제품" : "Device"}
+                            list={devices}
+                            selected={checkedDevices}
+                            selector={setCheckedDevices}
+                        />
+                        {/* 제품, LOT 번호, 공정, LOT Status */}
+                        <SearchSelector
+                            title={langState.isKor ? "LOT번호" : "LOT Numbers"}
+                            list={lotNumbers}
+                            selected={checkedLotNumbers}
+                            selector={setCheckedLotNumbers}
+                        />
+                        <SearchSelector
+                            title={langState.isKor ? "공정" : "Operation"}
+                            list={operations}
+                            selected={checkedOperations}
+                            selector={setCheckedOperations}
                         />
                     </div>
-                    <div className="chart-menu">
-                        <Icon
-                            icon={isTable ? "gridOff" : "grid"}
-                            size={26}
-                            onClick={setGridView}
-                        />
+                    <div className="chart-container">
+                        <div className="charts">
+                            <StackedBar
+                                title="일별 재공 추이도"
+                                labels={dailyLabels}
+                                datasets={dailyWipTrend}
+                            />
+                        </div>
+                        <div className="chart-menu">
+                            <Icon
+                                icon={isTable ? "gridOff" : "grid"}
+                                size={26}
+                                onClick={setGridView}
+                            />
+                        </div>
                     </div>
                 </div>
                 {isTable && (
                     <div className="tableForm">
                         <TableForm
-                            name="LotStatus"
+                            name="DailyWipTrend"
                             //tableHeaders={tableHeaders}
                             tableHeaders={newTableHeader}
                             tableBodies={tableBodies}

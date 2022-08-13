@@ -48,17 +48,10 @@ public class SearchController {
 
         return ResponseEntity.ok(hashMap);
     }
-    @PostMapping("/lot-status-two")
+    @PostMapping("/lot-status-new")
     public ResponseEntity<?>geLotStatus(@RequestBody DLODateDto dto){
         HashMap<String,Object> hashMap  = new HashMap<>();
         jdbcExample.getLotStatus(hashMap,dto);
-        return ResponseEntity.ok(hashMap);
-    }
-
-    @PostMapping("/avi-yield-report")
-    public ResponseEntity<?>getAviYieldReport(@RequestBody DLODateDto dto){
-        HashMap<String,Object> hashMap = new HashMap<>();
-        jdbcExample.getAviYieldReport(hashMap,dto);
         return ResponseEntity.ok(hashMap);
     }
     @PostMapping("/daily-wip-columnName")
@@ -67,12 +60,37 @@ public class SearchController {
         jdbcExample.getDailyWipColumnName(hashMap,dto);
         return ResponseEntity.ok(hashMap);
     }
-
     @PostMapping("/daily-wip-trend")
     public ResponseEntity<?>getDailyWiptrend(@RequestBody DLODateDto dto){
         HashMap<String,Object> hashMap = new HashMap<>();
         jdbcExample.getDailyWipTrend(hashMap,dto);
         return ResponseEntity.ok(hashMap);
     }
+    @PostMapping("/avi-yield-report")
+    public ResponseEntity<?>getAviYieldReport(@RequestBody DLODateDto dto){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        jdbcExample.getAviYieldReport(hashMap,dto);
+        return ResponseEntity.ok(hashMap);
+    }
 
+    @PostMapping("/avi-yield-report-new")
+    public ResponseEntity<?>getAviYieldReportNew(@RequestBody DLODateDto dto){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        jdbcExample.getAviYieldReportNew(hashMap,dto);
+        return ResponseEntity.ok(hashMap);
+    }
+
+    @PostMapping("/probe-yield-report")
+    public ResponseEntity<?>getProbeYieldReport(@RequestBody DLODateDto dto){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        jdbcExample.getProbeYieldReport(hashMap,dto);
+        return ResponseEntity.ok(hashMap);
+    }
+
+    @PostMapping("/total-yield-report")
+    public ResponseEntity<?>getTotalYieldReport(@RequestBody DLODateDto dto){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        jdbcExample.getTotalYieldReportNew(hashMap,dto);
+        return ResponseEntity.ok(hashMap);
+    }
 }

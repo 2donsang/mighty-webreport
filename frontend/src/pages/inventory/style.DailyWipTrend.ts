@@ -8,27 +8,38 @@ export const Container = styled.div<{isLookDown:boolean}>`
         `form{
             display : flex;
             flex-direction : column;
+            .condition_chart{
+                display : flex;
+                flex-directon : row;
+            }
             .condition_container{               
                 display : grid;
-                grid-template-columns : repeat(4, 1fr);
+                grid-template-columns : repeat(2, 1fr);
+                grid-template-rows : repeat(3, 1fr);
                 //gap: 20px 20px;
+                div:nth-child(2){
+                    grid-column: 1/2;
+                    grid-row : 2/3;
+                }
                 div:nth-child(3){
-                    grid-column: 3/5;
-                    grid-row : 1/2;
+                    grid-column: 1/2;
+                    grid-row : 3;
                 }
             }
         }`   
         :
         `form{
             display : flex;
-            flex-direction : row;
+            flex-direction : column-reverse;
             .condition_container{
-                display : grid;
-                grid-template-columns : 1fr 1fr;
-                grid-template-rows: repeat(4, minmax(100px, auto));
-                div:nth-child(3){
-                    grid-column-start : 1;
-                    grid-column-end : 3;
+                visibility: hidden;
+                height : 0px;
+                // display : grid;
+                // grid-template-columns : 1fr 1fr;
+                // grid-template-rows: repeat(4, minmax(100px, auto));
+                // div:nth-child(3){
+                //     grid-column-start : 1;
+                //     grid-column-end : 3;
                 }
             }     
         }`

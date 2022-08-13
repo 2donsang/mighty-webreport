@@ -53,7 +53,7 @@ export const Container = styled.div`
       background-color: white;
       position: absolute;
       width: 100%;
-      max-height: 170px;
+      max-height: 80px;
       overflow-y: auto;
       z-index: 1;
       list-style-position:inside;

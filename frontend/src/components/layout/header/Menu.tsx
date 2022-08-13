@@ -15,6 +15,8 @@ import DailyMovement from '../../../pages/product/DailyMovement';
 import LotStatusNew from '../../../pages/inventory/LotStatusNew';
 import TotalYield from '../../../pages/yield/TotalYield';
 import DailyWipTrend from '../../../pages/inventory/DailyWipTrend';
+import PTESTYieldNew from '../../../pages/yield/PTESTYieldNew';
+import AVIYieldNew from '../../../pages/yield/AVIYieldNew';
 
 type menuName = string | "Daily Movement" | "Operation Movement Monitoring" |
     "Daily Shipping Status" | "Fab Out Status By Device" | "View LOT Status"|
@@ -57,12 +59,14 @@ const MenuSet: Record<menuName, ITab> = {
     "AVI Yield Report" : {
         label : "AVI Yield Report",
         labelKor : "AVI Yield Report",
-        children : <AVIYield />
+        // children : <AVIYield />
+        children : <AVIYieldNew/>
     },
     "PTEST Yield Report" : {
         label : "PTEST Yield Report",
         labelKor : "PTEST Yield Report",
-        children : <PTESTYield />
+        //children : <PTESTYield />
+        children : <PTESTYieldNew/>
     },
     "Final PTEST Yield Report" : {
         label : "Final PTEST Yield Report",
@@ -81,7 +85,7 @@ const MenuSet: Record<menuName, ITab> = {
     },
     "View LOT Status(VLST)" : {
         label : "View LOT Status(VLST)",
-        labelKor : "LOT 정보 보회(VLST)",
+        labelKor : "LOT 정보 조회(VLST)",
         children : <LotStatusNew />
     },
     "Total Yield Report" : {

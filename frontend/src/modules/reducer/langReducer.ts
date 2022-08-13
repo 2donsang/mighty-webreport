@@ -7,18 +7,18 @@ interface ILang {
 }
 
 const initialState:ILang = {
-    isKor: true,
+    isKor : false,
 };
 
 const langReducer = (state:ILang = initialState, action:TLangAction) => {
     switch (action.type) {
         case A.SET_LANG_KOR :
             return {
-                isKor: true,
+                 isKor: true,
             };
         case A.SET_LANG_ENG :
             return {
-                isKor: false,
+                 isKor: false,
             };
         default :
             return state;

@@ -54,7 +54,7 @@ public class DLODateDto {
     }
 
     public String getOperationsString(){
-        if(operations.size() ==0){
+        if(operations == null || operations.size() ==0){
             return "";
         }
         StringBuilder sb = new StringBuilder();

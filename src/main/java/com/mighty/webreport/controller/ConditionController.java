@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -45,16 +46,22 @@ public class ConditionController {
     }
 
     @GetMapping("/deviceAndLotNumberAndOperation")
-    public ResponseEntity<?> getDeviceAndLotNumberAndOperation(){
+    public ResponseEntity<?> getDeviceAndLotNumberAndOperation(@RequestParam(value = "menuName",required = false) String menuName){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountContext accountContext = (AccountContext) authentication.getPrincipal();
         HashMap<String, Object> hashMap = new HashMap<>();
-        //conditionService.getDevices(hashMap, accountContext.getPlant());
-        jdbcExampleService.getDevices(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix());
-        //conditionService.getLotNumbers(hashMap, accountContext.getPlant());
-        jdbcExampleService.getLotNumbers(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix());
-        conditionService.getOperations(hashMap, accountContext.getPlant());
+        jdbcExampleService.getDevices(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix(), accountContext.getMember().getExternalFlag());
+        jdbcExampleService.getLotNumbers(hashMap, accountContext.getPlant(), accountContext.getMember().getExpandFieldSix(), accountContext.getMember().getExternalFlag());
 
+        if (menuName == null) {
+            conditionService.getOperationsNew(hashMap, accountContext.getPlant());
+        } else {
+            if (menuName.equals("AVIYield")) {
+                conditionService.getAVIOperations(hashMap, accountContext.getPlant());
+            } else if (menuName.equals("ProbeYield")) {
+                conditionService.getProbeOperations(hashMap, accountContext.getPlant());
+            }
+        }
         return ResponseEntity.ok(hashMap);
     }
 

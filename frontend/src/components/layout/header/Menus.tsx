@@ -12,14 +12,15 @@ const Menus = () => {
     useEffect(()=>{
         console.log(JSON.parse(localStorage.getItem("menus") || ""));
         setMenus(JSON.parse(localStorage.getItem("menus") || ""));
+        console.log("로그인후 langState는 ? "+langState.isKor);
     },[]);
 
 
     return (
         <S.Container>
-            {menus.map((menu : any) => (
+            {menus.map((menu : any) => (               
                 <div key={menu.menuId} className='menu-parent'>
-                    {langState.isKor ? menu.menuNameKor : menu.menuNameEng}
+                    {langState.isKor ? menu.menuNameKor : menu.menuNameEng }
                     <div className='menu-children'>
                         {menu.child.map((child : any) => (
                             <Menu

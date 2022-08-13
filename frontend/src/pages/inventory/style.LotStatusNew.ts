@@ -9,13 +9,14 @@ export const Container = styled.div<{isLookDown:boolean}>`
             display : flex;
             flex-direction : column;
             .condition_container{               
-                display : grid;
-                  grid-template-columns : repeat(4, 1fr);
-                //gap: 20px 20px;
-                div:nth-child(3){
-                    grid-column: 3/5;
-                    grid-row : 1/2;
-                }
+                // display : grid;
+                //   grid-template-columns : repeat(4, 1fr);
+                // //gap: 20px 20px;
+                // div:nth-child(3){
+                //     grid-column: 3/5;
+                //     grid-row : 1/2;
+                // }
+                display: flex;
             }
             .container{
                 display : grid;
@@ -29,11 +30,11 @@ export const Container = styled.div<{isLookDown:boolean}>`
             flex-direction : row;
             .condition_container{
                 display : grid;
-                grid-template-columns : 1fr 1fr;
+                grid-template-columns : 1fr;
                 grid-template-rows: repeat(4, minmax(100px, auto));
                 div:nth-child(3){
                     grid-column-start : 1;
-                    grid-column-end : 3;
+                    grid-column-end : 2;
                 }
             }     
         }`

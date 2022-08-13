@@ -2,8 +2,9 @@ package com.mighty.webreport.service.impl;
 
 import com.mighty.webreport.domain.dto.*;
 import com.mighty.webreport.domain.entity.admin.Customer;
+import com.mighty.webreport.domain.entity.admin.Operation;
+import com.mighty.webreport.repository.jdbcrepository.ConditionJDBCRepository;
 import com.mighty.webreport.repository.jdbcrepository.JDBCExampleRepository;
-import com.mighty.webreport.repository.jdbcrepository.LotStatusJDBCRepository;
 import com.mighty.webreport.repository.jparepository.CustomerRepository;
 import com.mighty.webreport.repository.jparepository.OperationRepository;
 import com.mighty.webreport.repository.querydsl.DeviceRepositoryCustom;
@@ -28,7 +29,7 @@ public class ConditionServiceImpl implements ConditionService {
 
     private final JDBCExampleRepository jdbcExampleRepository;
 
-    private final LotStatusJDBCRepository lotStatusJDBCRepository;
+    private final ConditionJDBCRepository conditionJDBCRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -65,9 +66,25 @@ public class ConditionServiceImpl implements ConditionService {
     @Override
     @Transactional(readOnly = true)
     public void getLotNumbers(HashMap<String, Object> hashMap, String plant) {
-        // 추후에 구현해야함
-        List<LotNumberResponse> lotNumbers =lotStatusJDBCRepository.getLotNumbers(plant);
+        List<LotNumberResponse> lotNumbers =conditionJDBCRepository.getLotNumbers(plant);
         hashMap.put("lotNumbers",lotNumbers);
+    }
+    @Override
+    public void getOperationsNew(HashMap<String, Object> hashMap, String plant) {
+        List<OperationResponse> operations = conditionJDBCRepository.getOperationList(plant);
+        hashMap.put("operations",operations);
+    }
+
+    @Override
+    public void getAVIOperations(HashMap<String, Object> hashMap, String plant) {
+        List<OperationResponse> operations = conditionJDBCRepository.getAVIOperationList(plant);
+        hashMap.put("operations",operations);
+    }
+
+    @Override
+    public void getProbeOperations(HashMap<String, Object> hashMap, String plant) {
+        List<OperationResponse> operations = conditionJDBCRepository.getProbeOperationList(plant);
+        hashMap.put("operations",operations);
     }
 
 }

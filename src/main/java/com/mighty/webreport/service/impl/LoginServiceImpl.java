@@ -88,10 +88,11 @@ public class LoginServiceImpl implements LoginService {
                 menus.get(i).setChild(new ArrayList<>());
                 newMenus.add(menus.get(i));
             }else{
-                //CHILD 레벨의 메뉴가 먼저 노출되는 경우 패스(기준정보에서 상위메뉴만 hide 처리 했을 경우
+                // 처음 시작에서 CHILD 레벨의 메뉴가 먼저 나타나는 경우 패스(자식 메뉴가 리스트에 있어도 상위메뉴가 Hide 처리되면 패스)
                 if(newMenus.size() ==0) {
                     continue;
                 }
+                //부모메뉴의 MenuId(01)와 자식메뉴의 MenuID(ex 01-01) 앞 2자리 비교해서 일치하는것 그 자식으로 Add
                 if(menus.get(i).getMenuId().substring(0,2).equals(newMenus.get(newMenus.size()-1).getMenuId())){
                     newMenus.get(newMenus.size()-1).getChild().add(menus.get(i));
                 }

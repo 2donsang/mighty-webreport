@@ -181,8 +181,8 @@ const LotStatus = () => {
             searchData.splice(counter,0,
                 {
                     operation : operationCol[operationNum].colName,
-                    qtyOne : operationCol[operationNum].colQty1,
-                    qtyTwo : operationCol[operationNum].colQty2,
+                    qtyOne : (operationCol[operationNum].colQty1).toString(),
+                    qtyTwo : (operationCol[operationNum].colQty2).toString(),
                     colSpan : operationCol[operationNum].colCount,
                     isOperation : true,
                     lotNumber : "total"
@@ -192,8 +192,8 @@ const LotStatus = () => {
             if(i === operationCol.length-1){
                 searchData.splice(0,0,{
                     operation : "",
-                    qtyOne : qty1,
-                    qtyTwo : qty2,
+                    qtyOne : qty1.toString(),
+                    qtyTwo : qty2.toString(),
                     lotNumber : "total",
                     colSpan : 0,
                     isOperation : true,
@@ -211,7 +211,7 @@ const LotStatus = () => {
                         key={"body"+index}
                     >
                         <tr>
-                            {element.isOperation && (
+                            {/* {element.isOperation && (
                                 <td
                                     style={{
                                         // @ts-ignore
@@ -246,7 +246,7 @@ const LotStatus = () => {
                                 typeof element.enterOperTime === "string" &&
                                 getMonthToMinute(getDate(element.enterOperTime))
                             }</span></td>
-                            <td><span>{element.equipmentId}</span></td>
+                            <td><span>{element.equipmentId}</span></td> */}
                         </tr>
                     </React.Fragment>
                 ))}

@@ -8,41 +8,29 @@ import lombok.*;
 @Builder
 public class LotStatusResponse {
 
-    private String operation;
-
+    private String device;
     private String lotNumber;
+    private String operation;
+    private String operationCount;
+    private String routeCount;
+    private String enterOperTime;
+    private Integer qtyOne;
+    private Integer qtyTwo;
+    private String customer;
+    private String processFlag;
+    private String startDate;
+    private String endDate;
+
 
     private String mainLot;
-
-    private Integer qtyOne;
-
     private String qtyUnitOne;
-
-    private Integer qtyTwo;
-
     private String qtyUnitTwo;
-
-    private String device;
-
-    private String customer;
-
     private Character inHold;
-
     private String holdNote;
-
     private Character inRework;
-
-    private String processFlag;
-
     private String deviceVer;
-
     private String deviceAttribute;
-
     private String shipAttribute;
-
     private String route;
-
-    private String enterOperTime;
-
     private String equipmentId;
 }

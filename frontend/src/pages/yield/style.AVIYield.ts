@@ -29,12 +29,13 @@ export const Container = styled.div<{isLookDown:boolean}>`
             flex-direction : row;
             .condition_container{
                 display : grid;
-                grid-template-columns : 1fr 1fr;
+                grid-template-columns : 1fr;
+                //gap: 20px 20px;
                 grid-template-rows: repeat(4, minmax(100px, auto));
-                div:nth-child(3){
-                    grid-column-start : 1;
-                    grid-column-end : 3;
-                }
+                // div:nth-child(3){
+                //     grid-column-start : 1;
+                //     grid-column-end : 3;
+                // }
             }     
         }`
         
