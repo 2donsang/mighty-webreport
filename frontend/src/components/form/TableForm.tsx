@@ -2,7 +2,7 @@ import * as S from './style.TableForm';
 import Table from "../common/Table";
 import {CSVHeader, TableHeader} from "../../types/type";
 import DatePickerForm from "./DatePickerForm";
-import React, {SetStateAction, useMemo, useState} from "react";
+import React, {SetStateAction, useEffect, useMemo, useRef, useState} from "react";
 import Icon from "../common/Icon";
 import { CSVLink } from "react-csv";
 import {ILotStatus} from "../../types/userData";
@@ -32,6 +32,8 @@ interface IProps {
     setEndDate? : React.Dispatch<SetStateAction<Date>>;
 }
 
+
+
 const TableForm = ({
     name,
     tableHeaders,
@@ -48,6 +50,11 @@ const TableForm = ({
     setEndDate
 }:IProps) => {
     const MENU_ID = "table-context-menu";
+    const tableref = useRef(null);
+
+    useEffect(() =>{
+
+    },[])
 
     const tableBodiesMemo = useMemo(()=>{
         return tableBodies;
@@ -60,6 +67,15 @@ const TableForm = ({
 
     const onViewAll = () => {
         setIsViewAll((prev) => !prev);
+    }
+
+    const xlsx = require( "xlsx" );
+
+    //Excel 확장자 .xlsx 형식 다운로드로 수정 2022.08.17 by 2donsang 
+    const ExcelDownload = () =>{
+
+        //@ts-ignore
+         tableref.current.exportExcel();
     }
 
     return (
@@ -79,14 +95,17 @@ const TableForm = ({
                 <div
                     className="btn-container"
                 >
-                    <CSVLink
+                    {/* <CSVLink
                         data={CSVData}
                         headers={CSVHeaders}
                         filename={`${name}${getTodayString()}`}
                         className='excel-btn'
                     >
                         <Icon icon="excel" size={24} color={color.green} />
-                    </CSVLink>
+                    </CSVLink> */}
+                    <button onClick={()=>ExcelDownload()}  className='excel-btn'>
+                        <Icon icon="excel" size={24} color={color.green} />
+                    </button>
                     <button
                         className="search-btn"
                     >
@@ -113,6 +132,8 @@ const TableForm = ({
                 }
             >
                 <Table
+                    tableRef = {tableref}
+                    name = {name}
                     headers={tableHeaders}
                     bodies={tableBodiesMemo}
                     isViewAll={isViewAll}
@@ -136,14 +157,17 @@ const TableForm = ({
                 }
 
                 <Item>
-                    <CSVLink
+                    {/* <CSVLink
                         data={CSVData}
                         headers={CSVHeaders}
                         filename={`${name}${getTodayString()}`}
                         className='excel-btn'
                     >
                         <span>액셀 다운로드</span>
-                    </CSVLink>
+                    </CSVLink> */}
+                     <button onClick={()=>ExcelDownload()} className='excel-btn'>
+                        <span>엑셀 다운로드</span>
+                    </button>
                 </Item>
                 <Separator />
             </Menu>

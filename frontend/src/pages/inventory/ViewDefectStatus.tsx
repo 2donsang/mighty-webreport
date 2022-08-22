@@ -112,7 +112,7 @@ const ViewDefectStatus = () => {
             })
             setDevices(devices);
             lotNumbers.splice(0,lotNumbers.length);
-            res.data.customers.map((lotNumber : ILotNumber) => {
+            res.data.lotNumbers.map((lotNumber : ILotNumber) => {
                 return lotNumbers.push({
                     id: lotNumber.id,
                     text : lotNumber.text,

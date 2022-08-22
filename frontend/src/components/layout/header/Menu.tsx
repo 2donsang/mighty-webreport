@@ -17,44 +17,25 @@ import TotalYield from '../../../pages/yield/TotalYield';
 import DailyWipTrend from '../../../pages/inventory/DailyWipTrend';
 import PTESTYieldNew from '../../../pages/yield/PTESTYieldNew';
 import AVIYieldNew from '../../../pages/yield/AVIYieldNew';
+import OperationMovementMonitoring from '../../../pages/product/OperationMovementMonitoring';
 
 type menuName = string | "Daily Movement" | "Operation Movement Monitoring" |
     "Daily Shipping Status" | "Fab Out Status By Device" | "View LOT Status"|
     "AVI Yield Report" | "PTEST Yield Report" | "Final PTEST Yield Report" |
-    "Current Month Sales Status" | "View Defect Status" |
-    "TEST"|  "View LOT Status(VLST)" | "Total Yield Report" | "DailyWipTrend";
+    "Current Month Sales Status" | "View Defect Status" | "View LOT Status(VLST)" | "Total Yield Report" | "DailyWipTrend";
      
 
 const MenuSet: Record<menuName, ITab> = {
-    "Daily Movement" : {
-        label : "Daily Movement",
-        labelKor : "Daily Movement",
-        children : <DailyMovement />
-    },
-    "View LOT Status" : {
-        label : "View LOT Status",
-        labelKor : "LOT 정보 조회",
-        children : <LotStatus />
-    },
-    "View Defect Status" : {
-        label : "View Defect Status",
-        labelKor : "불량현황 조회",
-        children : <ViewDefectStatus />
-    },
-    "Operation Movement Monitoring" : {
-        label : "Operation Movement Monitoring",
-        labelKor : "Operation Movement Monitoring",
-        children : <LotStatus />
-    },
-    "Daily Shipping Status" : {
-        label : "Daily Shipping Status",
-        labelKor : "Daily Shipping Status",
-        children : <DailyShippingStatus />
-    },
-    "Fab Out Status By Device" : {
-        label : "Fab Out Status By Device",
-        labelKor : "Device 출하기준(Yield,TAT)",
-        children : <DeviceShippingStatus />
+   
+    "View LOT Status(VLST)" : {
+        label : "View LOT Status(VLST)",
+        labelKor : "LOT 정보 조회(VLST)",
+        children : <LotStatusNew />
+    },   
+    "DailyWipTrend" : {
+        label : "DailyWipTrend",
+        labelKor : "일자별 재공 추이도",
+        children : <DailyWipTrend />
     },
     "AVI Yield Report" : {
         label : "AVI Yield Report",
@@ -68,36 +49,56 @@ const MenuSet: Record<menuName, ITab> = {
         //children : <PTESTYield />
         children : <PTESTYieldNew/>
     },
+    "Total Yield Report" : {
+        label : "Total Yield Report",
+        labelKor : "전체 Yield Report",
+        children : <TotalYield />
+    },
+
+    //▽ Searching은 되나 일단 미구현, 미완성 화면으로 분류함. MES 기준정보에서 권한 제외 2022.08.15 by 2donsang
+    "Daily Movement" : {
+        label : "Daily Movement",
+        labelKor : "Daily Movement",
+        children : <DailyMovement />
+    },
+    "Daily Shipping Status" : {
+        label : "Daily Shipping Status",
+        labelKor : "Daily Shipping Status",
+        children : <DailyShippingStatus />
+    },
+    "View Defect Status" : {
+        label : "View Defect Status",
+        labelKor : "불량현황 조회",
+        children : <ViewDefectStatus />
+    },
+    "View LOT Status" : {
+        label : "View LOT Status",
+        labelKor : "LOT 정보 조회",
+        children : <LotStatus />
+    },
+
+    //▽ 화면만 있고 구현은 안되어 있음. MES 기준정보에서 권한 제외 2022.08.15 by 2donsang
+    "Operation Movement Monitoring" : {
+        label : "Operation Movement Monitoring",
+        labelKor : "Operation Movement Monitoring",
+        children : <OperationMovementMonitoring />
+    },
     "Final PTEST Yield Report" : {
         label : "Final PTEST Yield Report",
         labelKor : "최종 PTEST Yield Report",
         children : <FinalPTESTYield />
+    },
+    "Fab Out Status By Device" : {
+        label : "Fab Out Status By Device",
+        labelKor : "Device 출하기준(Yield,TAT)",
+        children : <DeviceShippingStatus />
     },
     "Current Month Sales Status" : {
         label : "Current Month Sales Status",
         labelKor : "당월 판매실적 현황",
         children : <MonthlySalesPerformance />
     },
-    "TEST" : {
-        label : "TEST",
-        labelKor : "테스트",
-        children : <LotStatus />
-    },
-    "View LOT Status(VLST)" : {
-        label : "View LOT Status(VLST)",
-        labelKor : "LOT 정보 조회(VLST)",
-        children : <LotStatusNew />
-    },
-    "Total Yield Report" : {
-        label : "Total Yield Report",
-        labelKor : "전체 Yield Report",
-        children : <TotalYield />
-    },
-    "DailyWipTrend" : {
-        label : "DailyWipTrend",
-        labelKor : "일자별 재공 추이도",
-        children : <DailyWipTrend />
-    }
+    
     
 }
 

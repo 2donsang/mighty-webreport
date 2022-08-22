@@ -1,12 +1,16 @@
 import * as S from './style.Table';
 import { TableHeader } from "../../types/type";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {Dispatch, forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
+import {getTodayString} from "../../utils/dateUtil";
+import { saveAs } from 'file-saver';
 
 interface IProps {
     headers : TableHeader[];
     bodies : JSX.Element;
     isViewAll : boolean;
     isLookDown : boolean;
+    name : string;
+    tableRef : any;
 }
 
 interface Headers {
@@ -23,9 +27,8 @@ const createHeaders = (headers:TableHeader[]) => {
     }))
 }
 
-const Table = ({ headers , bodies ,isViewAll , isLookDown }:IProps) => {
+const Table = ({ headers , bodies ,isViewAll , isLookDown, name, tableRef }:IProps) => {
 
-    console.log(headers);
     const [tableHeight,setTableHeight] = useState("auto");
     const [activeIndex,setActiveIndex] = useState(-1);
     const tableElement = useRef<HTMLTableElement>(null);
@@ -84,13 +87,59 @@ const Table = ({ headers , bodies ,isViewAll , isLookDown }:IProps) => {
         };
     },[activeIndex, mouseMove, mouseUp, removeListeners]);
 
+
+    //xls 용 장점 : 텍스트 스타일, 컬럼컬러도 똑같이 적용된다. 그런데 한글이 깨진다 사용 X
+    function exceller() {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+          template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+          base64 = function(s:any) {
+            return window.btoa(unescape(encodeURIComponent(s)))
+          },
+          format = function(s:any, c:any) {
+            return s.replace(/{(\w+)}/g, function(m:any, p:any) {
+              return c[p];
+            })
+          }
+        var toExcel = 
+        //@ts-ignore
+        document.getElementById("toExcel").innerHTML;
+        var ctx = {
+          worksheet: 'test' || '',
+          table: toExcel
+        };
+        var link = document.createElement("a");
+        link.download = "export.xls";
+        link.href = uri + base64(format(template, ctx))
+        link.click();
+      }
+
+      useImperativeHandle(tableRef,() =>({
+        exportExcel 
+      }))
+
+    const xlsx = require( "xlsx" );
+    function exportExcel(){
+        let wb = xlsx.utils.book_new();
+        let ws = xlsx.utils.table_to_sheet(tableElement.current);
+        xlsx.utils.book_append_sheet(wb, ws, `${name}`);
+        let wbout =  xlsx.write(wb, {bookType:'xlsx', type:'binary'})
+        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), `${name}${getTodayString()}.xlsx`)
+    }
+
+    function s2ab(s:any) { 
+        let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        let view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;    
+      }
+
     return (
         <S.Container
             headers={headers}
             isViewAll={isViewAll}
             isLookDown={isLookDown}
         >
-            <table
+            <table 
                 ref={tableElement}
             >
                 <thead>

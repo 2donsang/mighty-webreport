@@ -52,7 +52,7 @@ const DatePickerForm = ({startDate , endDate , isRangeSearch = false , setStartD
           <div className="date-picker-container">
               <DatePicker
                   selected={startDate}
-                  dateFormat="yyyy-MM-dd"
+                  dateFormat={isRangeSearch? "yyyy-MM-dd" : "yyyy-MM"}
                   onChange={date => date!==null && (setStartDate && setStartDate(date))}
                   maxDate={endDate}
                   selectsStart={true}

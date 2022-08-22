@@ -15,6 +15,7 @@ public class TotalYieldReportResponse {
     private String turn;
     private Integer totalProbe;
     private Integer passProbe;
+    private Integer failProbe;
     private Double yieldProbe;
     private String b2;
     private String b3;
@@ -27,5 +28,6 @@ public class TotalYieldReportResponse {
     private Integer passAvi;
     private Double yieldAvi;
     private String shipmentDate;
+    private Double cumYield;
 
 }

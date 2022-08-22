@@ -43,6 +43,7 @@ export interface ILotStatus {
     device?: string| null;
     lotNumber?: string| null;
     operation?: string| null;
+    operationDesc?: string |null;
     operationCount?:string|null;
     routeCount?:string| null;
     enterOperTime?: string| null;
@@ -52,17 +53,6 @@ export interface ILotStatus {
     processFlag?: string| null;
     startDate?: string|null;
     endDate?: string|null;
-    // mainLot?: string | null;
-    // qtyUnitOne?: string| null;
-    // qtyUnitTwo?: string | null;
-    // inHold?: string| null;
-    // holdNote?: string | null;
-    // inRework?: string| null;
-    // deviceVer?: string | null;
-    // deviceAttribute?: string | null;
-    // shipAttribute?: string | null;
-    // route?: string| null;
-    // equipmentId?: string | null;
     isOperation?: boolean;
     colSpan? : number;
 }
@@ -86,6 +76,8 @@ export interface IAVIYield{
     colSpanTwo?:number;
     isLotNumber?:boolean;
     colSpanThree?:number;
+    isTurn?:boolean;
+    colSpanFour?:number;
     cellColor?: string| null;
     isTotal?:boolean;
 
@@ -109,6 +101,8 @@ export interface IPTESTYield{
     colSpanTwo?:number;
     isLotNumber?:boolean;
     colSpanThree?:number;
+    isTurn?:boolean;
+    colSpanFour?:number;
     cellColor?: string| null;
     isTotal?:boolean;
 }
@@ -120,6 +114,7 @@ export interface ITotalYield{
     turn?: string|null;
     totalProbe?: string|null;
     passProbe?: string|null;
+    failProbe?: string|null;
     yieldProbe?: number|null;
     b2?: string|null;
     b3?: string|null;
@@ -128,16 +123,19 @@ export interface ITotalYield{
     b6?: string|null;
     b7?: string|null;
     b8?: string|null;
-    totalAvi?: number|null;
+    totalAvi?: string|null;
     passAvi?: string|null;
-    yieldAvi?: string|null;
+    yieldAvi?: number|null;
     shipmentDate?: string|null;
+    cumYield?: number|null;
     isTranstime?: boolean;
     colSpan?: number;
     isDevice?: boolean;
     colSpanTwo?:number;
     isLotNumber?:boolean;
     colSpanThree?:number;
+    isTurn?:boolean;
+    colSpanFour?:number;
     cellColor?: string| null;
     isTotal?:boolean;
 }
@@ -170,3 +168,36 @@ export interface LotNumberCol{
     lotNumberGoodDie: number,
     lotNumberFailDie: number,
 }
+
+export interface TurnCol{
+    rowCount: number;
+    TransTime: string;   
+    deviceName: string;   
+    lotNumber: string;
+    waferId?: string | null;
+    operation?: string | null;
+    turn : string;
+    turnYield: number,
+    turnTestDie: number,
+    turnGoodDie: number,
+    turnFailDie: number,
+}
+
+export interface TotalCol{
+    rowCount: number;
+    TransTime?: string | null;   
+    deviceName: string;   
+    lotNumber?: string |null;
+    waferId?: string | null;
+    turn? : string | null;
+    TestDieProbe: number,
+    GoodDieProbe: number,
+    FailDieProbe: number,
+    YieldProbe: number,
+    TestDieAvi: number,
+    GoodDieAvi: number,
+    FailDieAvi?: number | null,
+    YieldAvi: number,
+    YieldCum:number,
+}
+

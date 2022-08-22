@@ -2,6 +2,7 @@ package com.mighty.webreport.service.impl;
 
 import com.mighty.webreport.domain.dto.AuthenticationDto;
 import com.mighty.webreport.domain.dto.MenuResponse;
+import com.mighty.webreport.domain.entity.admin.AuthorityRole;
 import com.mighty.webreport.domain.entity.admin.Member;
 import com.mighty.webreport.domain.entity.idclass.MenuGroupId;
 import com.mighty.webreport.domain.entity.system.MenuGroup;;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,6 @@ public class LoginServiceImpl implements LoginService {
     private final MenuGroupRepository menuGroupRepository;
 
     private final MenuRepositoryCustom menuRepositoryCustom;
-
     private final MenuJDBCRepositoryCustom menuJDBCRepositoryCustom;
 
 
@@ -59,10 +61,15 @@ public class LoginServiceImpl implements LoginService {
 
         Member member = accountContext.getMember();
 
+        //메뉴 그룹 잘못 가져오는 것을 수정함.(권한그룹이 아닌 해당 권한그룹의 메뉴권한으로)
+        //groupId를 member의 rolID가 아닌 ADM_AUTHORITY_ROLE테이블에서 ROL_ID =member.getRole()인 MES_MENU_GROUP으로 넣도록 수정 2022.08.16 by 2donsang
+        String mesMenugroup = menuJDBCRepositoryCustom.getMenuGroup(accountContext.getPlant(), member.getRole());
+        String moduleId = "WEBREPORT";
         MenuGroup menuGroup = menuGroupRepository.findById(MenuGroupId.builder()
-                .groupId(member.getRole())
+                //.groupId(member.getRole())
+                .groupId(mesMenugroup)
                 .plant(member.getPlant())
-                .moduleId("WEBREPORT")
+                .moduleId(moduleId)
                 .build())
                 .orElse(null);
 
@@ -72,7 +79,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
 //        List<MenuResponse> menus = setMenuDepth(menuRepositoryCustom.getMenu(accountContext.getPlant()));
-        List<MenuResponse> menus = setMenuDepth(menuJDBCRepositoryCustom.getMenu(accountContext.getPlant()));
+        List<MenuResponse> menus = setMenuDepth(menuJDBCRepositoryCustom.getMenu((accountContext.getPlant()), moduleId, mesMenugroup));
         String jwt = "Bearer " + provider.createToken(authentication);
 
         hashMap.put("isAuth",true);
@@ -88,7 +95,9 @@ public class LoginServiceImpl implements LoginService {
                 menus.get(i).setChild(new ArrayList<>());
                 newMenus.add(menus.get(i));
             }else{
+
                 // 처음 시작에서 CHILD 레벨의 메뉴가 먼저 나타나는 경우 패스(자식 메뉴가 리스트에 있어도 상위메뉴가 Hide 처리되면 패스)
+                //쿼리가  권한으로 조회되면서 사실상 필요없는 로직..2022.08.16 by 2donsang
                 if(newMenus.size() ==0) {
                     continue;
                 }

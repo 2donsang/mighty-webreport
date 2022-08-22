@@ -10,9 +10,7 @@ const Menus = () => {
     const langState = useSelector((state:RootState) => state.langReducer);
 
     useEffect(()=>{
-        console.log(JSON.parse(localStorage.getItem("menus") || ""));
         setMenus(JSON.parse(localStorage.getItem("menus") || ""));
-        console.log("로그인후 langState는 ? "+langState.isKor);
     },[]);
 
 

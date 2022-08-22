@@ -14,9 +14,8 @@ export const Container = styled.div<{isLookDown:boolean}>`
             }
             .condition_container{               
                 display : grid;
-                grid-template-columns : repeat(2, 1fr);
+                grid-template-columns : repeat(1, 1fr);
                 grid-template-rows : repeat(3, 1fr);
-                //gap: 20px 20px;
                 div:nth-child(2){
                     grid-column: 1/2;
                     grid-row : 2/3;
@@ -26,6 +25,9 @@ export const Container = styled.div<{isLookDown:boolean}>`
                     grid-row : 3;
                 }
             }
+            .tableForm{
+                height:auto;
+            }
         }`   
         :
         `form{
@@ -34,23 +36,20 @@ export const Container = styled.div<{isLookDown:boolean}>`
             .condition_container{
                 visibility: hidden;
                 height : 0px;
-                // display : grid;
-                // grid-template-columns : 1fr 1fr;
-                // grid-template-rows: repeat(4, minmax(100px, auto));
-                // div:nth-child(3){
-                //     grid-column-start : 1;
-                //     grid-column-end : 3;
-                }
-            }     
+                } 
         }`
     }
 
     .chart-container{
         ${(props) => props.isLookDown ?
-            `padding-top: 20px` 
+            `
+            padding-top: 20px;
+            padding-left: 80px;
+            ` 
             : 
-            `padding-left: 20px` };
-        .chart-menu{
+            `padding-left: 400px;` 
+        };
+        .chart-menu{    
         text-align: right;
         margin-right: 22px;
         svg {

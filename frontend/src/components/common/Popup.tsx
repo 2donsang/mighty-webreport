@@ -4,8 +4,12 @@ import {hideAlertModal} from "../../modules/action/alertAction";
 import {IAlert} from "../../types/type";
 import Button from "./Button";
 import {useEffect, useRef} from "react";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../modules';
 
 const Popup = ({ header , bold , text , show , callback }:IAlert) => {
+
+    const langState = useSelector((state:RootState) => state.langReducer);
     const dispatch = useDispatch();
     const popUpRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +50,7 @@ const Popup = ({ header , bold , text , show , callback }:IAlert) => {
                     </span>
                 </div>
                 <div className='button-container'>
-                    <Button text="닫기" onClick={onClick}/>
+                    <Button text= {langState.isKor? "닫기" : "Close"} onClick={onClick}/>
                 </div>
                 <input className="hidden" type="text" ref={popUpRef}/>
             </div>

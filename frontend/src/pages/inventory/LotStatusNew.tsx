@@ -19,44 +19,43 @@ interface OperationCol {
     colQty2: number;
 }
 
-const tableHeaders:TableHeader[] =[
-    {text:"제품", width:"230px"},
-    {text:"LOT", width:"130px"},
-    {text:"공정", width:"150px"},
-    {text:"현재공정순서", width:"80px"},
-    {text:"라우트내공정수", width:"80px"},
-    {text:"공정투입일자", width:"130px"},
-    {text:"WFS수량", width:"70px"},
-    {text:"PCS수량", width:"100px"},    
-    {text:"고객사", width:"80px"},
-    {text:"상태", width:"40px"},
-    {text:"작업시작일자", width:"130px"},
-    {text:"작업완료일자", width:"130px"},
-];
-
-const CSVHeaders:CSVHeader[] =[
-
-    {label:"제품",key:"device"},
-    {label:"LOT",key:"lotNumber"},
-    {label:"공정",key:"operation"},
-    {label:"현재공정순서",key:"operationCount"},
-    {label:"라우트내공정수",key:"routeCount"},
-    {label:"공정투입일자",key:"enterOperTime"},
-    {label:"WFS수량",key:"qtyOne"},
-    {label:"PCS수량",key:"qtyTwo"},
-    {label:"고객사",key:"customer"},
-    {label:"상태",key:"processFlag"},
-    {label:"작업시작일자",key:"startDate"},
-    {label:"작업완료일자",key:"endDate"},
-
-]
-
 
 const LotStatusTest = () =>{
-
-
-
     const langState = useSelector((state:RootState) => state.langReducer);
+
+    const tableHeaders:TableHeader[] =[
+        {text: langState.isKor? "제품" : "Device", width:"230px"},
+        {text: langState.isKor? "로트" : "LOT", width:"130px"},
+        {text: langState.isKor? "공정" : "Operation", width:"150px"},
+        {text: langState.isKor? "현재공정순서" : "CurrentSeq", width:"80px"},
+        {text: langState.isKor? "전체공정수" : "Total Operation Qty", width:"150px"},
+        {text: langState.isKor? "공정투입일자" : "Operation Input Time", width:"150px"},
+        {text: langState.isKor? "웨이퍼수량" : "Wafer Qty", width:"70px"},
+        {text: langState.isKor? "PCS수량" : "PCS Qty", width:"100px"},    
+        {text: langState.isKor? "고객사" : "Customer", width:"100px"},
+        {text: langState.isKor? "상태" : "State", width:"40px"},
+        {text: langState.isKor? "작업시작일자" : "Start Date", width:"100px"},
+        {text: langState.isKor? "작업완료일자" : "End Date", width:"130px"},
+    ];
+
+    const CSVHeaders:CSVHeader[] =[
+
+        {label: langState.isKor? "제품" : "Device",key:"device"},
+        {label: langState.isKor? "로트" : "LOT",key:"lotNumber"},
+        {label: langState.isKor? "공정" : "Operation",key:"operation"},
+        {label: langState.isKor? "현재공정순서" : "CurrentSeq",key:"operationCount"},
+        {label: langState.isKor? "전체공정수" : "Total Operation Qty",key:"routeCount"},
+        {label: langState.isKor? "공정투입일자" : "Operation Input Time",key:"enterOperTime"},
+        {label: langState.isKor? "WFS수량" : "Wafer Qty",key:"qtyOne"},
+        {label: langState.isKor? "PCS수량" : "PCS Qty",key:"qtyTwo"},
+        {label: langState.isKor? "고객사" : "Customer",key:"customer"},
+        {label: langState.isKor? "상태" : "State",key:"processFlag"},
+        {label: langState.isKor? "작업시작일자" : "Start Date",key:"startDate"},
+        {label: langState.isKor? "작업완료일자" : "End Date",key:"endDate"},
+    
+    ]
+    
+   
     // 제품, LOT 번호, 공정, LOT Status
     const [isLookDown,setIsLookDown] = useState(false);
     const [devices, setDevices] = useState<ISearchBox[]>([]);
@@ -89,9 +88,14 @@ const LotStatusTest = () =>{
 
             const res = await ApiUtil.post("/search/lot-status-new", params);    
             if(res.data.lotStatus.length == 0){
-                dispatch(showAlertModal("확인메세지","데이터","가 없습니다."));
+                if(langState.isKor)
+                {
+                    dispatch(showAlertModal("확인메세지","데이터","가 없습니다."));
+                }else{
+                    dispatch(showAlertModal("Information","Data"," does not exist."));
+                }
+                
             }
-            console.log(res.data.lotStatus);
             setSearchData(res.data.lotStatus);
         }
         callAPI();
@@ -152,8 +156,8 @@ const LotStatusTest = () =>{
                             <td><span>{element.operationCount}</span></td>
                             <td><span>{element.routeCount}</span></td>
                             <td><span>{element.enterOperTime}</span></td>
-                            <td style={{textAlign : "right"}}><span>{element.qtyOne}</span></td>
-                            <td style={{textAlign : "right"}}><span>{element.qtyTwo}</span></td>
+                            <td><span>{element.qtyOne}</span></td>
+                            <td><span>{element.qtyTwo}</span></td>
                             <td><span>{element.customer}</span></td>
                             <td><span>{element.processFlag}</span></td>
                             <td><span>{element.startDate}</span></td>

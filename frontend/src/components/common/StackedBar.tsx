@@ -32,24 +32,25 @@ ChartJS.register(
 );
 
 const StackedBar = ({ title , labels , datasets }:IProps) => {
-
     const options = {
+        
         responsive : true,
         plugins : {
             legend : {
-                position : 'top' as const,
+                position : 'bottom' as const,
             },
             title : {
                 display : true,
                 text : title
             },
-        },
+            
+        },       
         scales: {
             x: {
-              stacked: true,
+              stacked: true,             
             },
             y: {
-              stacked: true,
+              stacked: true,             
             },
           },
     }

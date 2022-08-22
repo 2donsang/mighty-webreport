@@ -2,6 +2,6 @@ import styled from "styled-components";
 import color from "../../styles/color";
 
 export const Container = styled.div`
-   width: 900px;
-   height: 500;
+width: 1000px;
+height: 500px;
 `;

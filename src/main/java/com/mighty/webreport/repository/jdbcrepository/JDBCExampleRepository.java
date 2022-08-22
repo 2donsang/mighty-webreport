@@ -63,7 +63,7 @@ public class JDBCExampleRepository {
         sql.append("   SELECT GET_DEVICE_DESC (A.PLANT, A.DEVICE)                                               ");
         sql.append("              AS DEVICE,                                                                    ");
         sql.append("          A.LOT_NUMBER,                                                                     ");
-        sql.append("          GET_OPERATION_DESC (A.PLANT, A.OPERATION)                                         ");
+        sql.append("          GET_OPERATION_DESC_ONLY(A.PLANT, A.OPERATION)                                    ");
         sql.append("              AS OPERATION,                                                                 ");
         sql.append("          (SELECT OPER_SEQ                                                                  ");
         sql.append("             FROM ADM_ROUTE_OPERATION                                                       ");
@@ -541,11 +541,11 @@ public class JDBCExampleRepository {
 
         sb.append("   SELECT                                                       ");
 //        sb.append("          TRANSTIME,                                            ");
-        sb.append(" TO_CHAR(TO_DATE(A.TRANSTIME,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD') TRANSTIME, ");
+        sb.append(" TO_CHAR(TO_DATE(A.HEADER_1, 'YYYY.MM.DD'), 'YYYY-MM-DD') AS TESTDATE, ");
         sb.append("          GET_DEVICE_DESC(A.PLANT, A.DEVICE) DEVICE,            ");
         sb.append("          A.LOT_NUMBER,                                         ");
         sb.append("          A.HEADER_5      AS WAFER_ID,                          ");
-        sb.append("          GET_OPERATION_DESC(A.PLANT, A.OPERATION) OPERATION,   ");
+        sb.append("          GET_OPERATION_DESC_ONLY(A.PLANT, A.OPERATION) OPERATION,   ");
         sb.append("          A.TURN,                                               ");
         sb.append("          A.HEADER_9      AS YIELD,                             ");
         sb.append("          A.HEADER_7      AS TESTCOUNT,                         ");
@@ -581,7 +581,7 @@ public class JDBCExampleRepository {
             sb.append(" AND A.LOT_NUMBER IN ( "+lotNumbers+")                    ");
         }
         if(!startDate.isEmpty()){
-            sb.append(" AND A.TRANSTIME BETWEEN :startDate AND :endDate           ");
+            sb.append(" AND TO_CHAR(TO_DATE(A.HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD')>=:startDate AND TO_CHAR(TO_DATE(A.HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD') <= :endDate          ");
         }
 
         sb.append(" ORDER BY TRANSTIME, TO_NUMBER (CNT)                                       ");
@@ -598,7 +598,7 @@ public class JDBCExampleRepository {
         RowMapper<AviYieldReportResponse> aviYieldReportResponseRowMapper = (rs, rowNum) -> {
             return AviYieldReportResponse.builder()
                     .failCodeList("")
-                    .transTime(rs.getString("TRANSTIME"))
+                    .transTime(rs.getString("TESTDATE"))
                     .device(rs.getString("DEVICE"))
                     .lotNumber(rs.getString("LOT_NUMBER"))
                     .mainLot("")
@@ -607,8 +607,8 @@ public class JDBCExampleRepository {
                     .turn(rs.getString("TURN"))
                     .slotId("")
                     .passRate(rs.getDouble("YIELD"))
-                    .qtyGoodDie(rs.getInt("TESTCOUNT"))
-                    .qtyTestDie(rs.getInt("PASSCOUNT"))
+                    .qtyGoodDie(rs.getInt("PASSCOUNT"))
+                    .qtyTestDie(rs.getInt("TESTCOUNT"))
                     .qtyFailDie(rs.getInt("FAILCOUNT"))
                     .build();
         };
@@ -714,7 +714,7 @@ public class JDBCExampleRepository {
                 sb.append("             Union All                                                                                                   ");
 
             sb.append("            Select '" + sel_oper + "' as Operation                                                                           ");
-            sb.append("            ,Get_Operation_Desc(plant, '" + sel_oper + "') AS Operation_Desc                                                 ");
+            sb.append("            ,Get_Operation_Desc_only(plant, '" + sel_oper + "') AS Operation_Desc                                                 ");
 
             for (int j = 0; j < dateList.size(); j++)
             {//날짜별로 칼럼 뽑음.
@@ -778,7 +778,7 @@ public class JDBCExampleRepository {
                     sb.append("             Union All                                                                                                   ");
 
                 sb.append("            Select '" + sel_oper + "' as Operation                                                                           ");
-                sb.append("            ,Get_Operation_Desc(plant, '" + sel_oper + "') AS Operation_Desc                                                 ");
+                sb.append("            ,Get_Operation_Desc_only(plant, '" + sel_oper + "') AS Operation_Desc                                                 ");
 
                 for (int j = 0; j < dateList.size(); j++)
                 {//날짜별로 칼럼 뽑음.
@@ -878,10 +878,9 @@ public class JDBCExampleRepository {
                                                               String endDate, String externalFlag) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(" SELECT                                                       ");
-        sb.append("   TO_CHAR(TO_DATE(A.TRANS_TIME,'YYYYMMDDHH24MISS'),'YYYY-MM-DD') TRANS_TIME ");
-//        sb.append("   A.TRANS_TIME                                                                       ");
-        sb.append(" , GET_DEVICE_DESC(A.PLANT,A.DEVICE) DEVICE                                      ");
+        sb.append(" SELECT                                                                              ");
+        sb.append("   TO_CHAR(TO_DATE(A.TRANS_TIME,'YYYYMMDDHH24MISS'),'YYYY-MM-DD') TRANS_TIME         ");
+        sb.append(" , GET_DEVICE_DESC(A.PLANT,A.DEVICE) DEVICE                                          ");
         sb.append(" ,A.LOT_NUMBER                                                                        ");
         sb.append(" ,A.WAFER_ID                                                                          ");
         sb.append(" , GET_OPERATION_DESC_ONLY(A.PLANT,A.OPERATION) OPERATION                             ");
@@ -890,19 +889,18 @@ public class JDBCExampleRepository {
         sb.append(" ,A.TESTCOUNT                                                                         ");
         sb.append(" ,A.PASSCOUNT                                                                         ");
         sb.append(" ,A.FAILCOUNT                                                                         ");
-//        sb.append(" ,TO_CHAR(TO_DATE(A.TESTDATE,'YYYYMMDDHH24MISS'),'YYYY-MM-DD') TESTDATE      ");
         sb.append(" ,A.TESTDATE                                                                           ");
         sb.append(" FROM TDMS_PROBE_SPEC_HEADER A, ASFC_LOT_STATUS B   ");
         sb.append(" WHERE A.PLANT = :plant                                       ");
         sb.append("     AND A.PLANT = B.PLANT                                     ");
         sb.append("     AND A.LOT_NUMBER = B.LOT_NUMBER                          ");
-        sb.append("     AND A.OPERATION IN                                       ");
-        sb.append("     (SELECT GROUP_OBJECT                                     ");
-        sb.append("           FROM ADM_GROUP_CATEGORY_DATA                       ");
-        sb.append("          WHERE PLANT           = :plant                      ");
-        sb.append("            AND GROUP_TARGET = 'OPERATION'                    ");
-        sb.append("            AND GROUP_INDEX  = 3                              ");
-        sb.append("            AND GROUP_VALUE = 'PTEST')                        ");
+//        sb.append("     AND A.OPERATION IN                                       ");
+//        sb.append("     (SELECT GROUP_OBJECT                                     ");
+//        sb.append("           FROM ADM_GROUP_CATEGORY_DATA                       ");
+//        sb.append("          WHERE PLANT           = :plant                      ");
+//        sb.append("            AND GROUP_TARGET = 'OPERATION'                    ");
+//        sb.append("            AND GROUP_INDEX  = 3                              ");
+//        sb.append("            AND GROUP_VALUE = 'PTEST')                        ");
         if(externalFlag.equals("Y")){
             if(customer !=null && !customer.isEmpty()){
                     sb.append("     AND B.CUSTOMER = :customer                               ");
@@ -963,6 +961,7 @@ public class JDBCExampleRepository {
         sb.append("        A.TURN,                                                                                  ");
         sb.append("        A.TOTAL_PROBE,                                                                           ");
         sb.append("        A.PASS_PROBE,                                                                            ");
+        sb.append("        A.FAIL_PROBE,                                                                            ");
         sb.append("        A.YIELD_PROBE,                                                                           ");
         sb.append("        A.B2,                                                                                    ");
         sb.append("        A.B3,                                                                                    ");
@@ -974,25 +973,30 @@ public class JDBCExampleRepository {
         sb.append("        A.TOTAL_AVI,                                                                             ");
         sb.append("        A.PASS_AVI,                                                                              ");
         sb.append("        A.YIELD_AVI,                                                                             ");
-        sb.append("        TO_CHAR (TO_DATE (C.TRANS_TIME, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD')    AS SHIPMENT_DATE   ");
+        sb.append("        TO_CHAR (TO_DATE (C.TRANS_TIME, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD')    AS SHIPMENT_DATE,   ");
+        sb.append("        A.YIELD_CUM                                                                              ");
         sb.append("   FROM (  SELECT MAX (DEVICE)         AS DEVICE,                                                ");
         sb.append("                  MAX (LOT_NUMBER)     AS LOT_NUMBER,                                            ");
         sb.append("                  WAFER_ID,                                                                      ");
         sb.append("                  TURN,                                                                          ");
-        sb.append("                  MAX (TESTCOUNT)      AS TOTAL_PROBE,                                           ");
-        sb.append("                  MAX (PASSCOUNT)      AS PASS_PROBE,                                            ");
-        sb.append("                  MAX (FAILCOUNT)      AS YIELD_PROBE,                                           ");
-        sb.append("                  MAX (B2)             AS B2,                                                    ");
-        sb.append("                  MAX (B3)             AS B3,                                                    ");
-        sb.append("                  MAX (B4)             AS B4,                                                    ");
-        sb.append("                  MAX (B5)             AS B5,                                                    ");
-        sb.append("                  MAX (B6)             AS B6,                                                    ");
-        sb.append("                  MAX (B7)             AS B7,                                                    ");
-        sb.append("                  MAX (B8)             AS B8,                                                    ");
-        sb.append("                  MAX (TOTAL_AVI)      AS TOTAL_AVI,                                             ");
-        sb.append("                  MAX (PASS_AVI)       AS PASS_AVI,                                              ");
-        sb.append("                  MAX (YIELD_AVI)      AS YIELD_AVI,                                             ");
-        sb.append("                  MAX (TRANS_TIME)     AS TRANS_TIME                                             ");
+        sb.append("                  MAX (TO_NUMBER(TESTCOUNT))      AS TOTAL_PROBE,                                           ");
+        sb.append("                  MAX (TO_NUMBER(PASSCOUNT))      AS PASS_PROBE,                                            ");
+        sb.append("                  MAX (TO_NUMBER(FAILCOUNT))      AS FAIL_PROBE,                                            ");
+        sb.append("                  MAX (TO_NUMBER(TRUNC(YIELD_PROBE,2)))      AS YIELD_PROBE,                                           ");
+        sb.append("                  MAX (TO_NUMBER(B2))             AS B2,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B3))             AS B3,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B4))             AS B4,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B5))             AS B5,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B6))             AS B6,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B7))             AS B7,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(B8))             AS B8,                                                    ");
+        sb.append("                  MAX (TO_NUMBER(TOTAL_AVI))      AS TOTAL_AVI,                                             ");
+        sb.append("                  MAX (TO_NUMBER(PASS_AVI))       AS PASS_AVI,                                              ");
+        sb.append("                  MAX (TO_NUMBER(YIELD_AVI))      AS YIELD_AVI,                                             ");
+        sb.append("                  MAX (TRANS_TIME)     AS TRANS_TIME,                                             ");
+        sb.append(" CASE WHEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) <>0 AND MAX(TO_NUMBER(YIELD_AVI))<>0 THEN TRUNC((MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2)))/100 * MAX(TO_NUMBER(YIELD_AVI))/100)*100,2) ");
+        sb.append("                 WHEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) =0 OR MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) IS NULL THEN MAX(TO_NUMBER(YIELD_AVI))                                      ");
+        sb.append("                 WHEN MAX(TO_NUMBER(YIELD_AVI)) =0 OR MAX(TO_NUMBER(YIELD_AVI)) IS NULL THEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) ELSE 0 END AS YIELD_CUM                         ");
         sb.append("             FROM (SELECT DEVICE,                                                                ");
         sb.append("                          LOT_NUMBER,                                                            ");
         sb.append("                          WAFER_ID,                                                              ");
@@ -1001,6 +1005,7 @@ public class JDBCExampleRepository {
         sb.append("                          TESTCOUNT,                                                             ");
         sb.append("                          PASSCOUNT,                                                             ");
         sb.append("                          FAILCOUNT,                                                             ");
+        sb.append("                          YIELD AS YIELD_PROBE,                                                             ");
         sb.append("                          B2,                                                                    ");
         sb.append("                          B3,                                                                    ");
         sb.append("                          B4,                                                                    ");
@@ -1029,6 +1034,7 @@ public class JDBCExampleRepository {
         sb.append("                          '' AS TESTCOUNT,                                                       ");
         sb.append("                          '' AS PASSCOUNT,                                                       ");
         sb.append("                          '' AS FAILCOUNT,                                                       ");
+        sb.append("                          '' AS YIELD_PROBE,                                                     ");
         sb.append("                          '' AS B2,                                                              ");
         sb.append("                          '' AS B3,                                                              ");
         sb.append("                          '' AS B4,                                                              ");
@@ -1039,7 +1045,7 @@ public class JDBCExampleRepository {
         sb.append("                          HEADER_7 AS TOTAL_AVI,                                                 ");
         sb.append("                          HEADER_8 AS PASS_AVI,                                                  ");
         sb.append("                          HEADER_9 AS YIELD_AVI,                                                 ");
-        sb.append("                          TRANSTIME     AS TRANS_TIME                                            ");
+        sb.append("                          TO_CHAR(TO_DATE(HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD') || TO_CHAR(TO_DATE(REPLACE(HEADER_2, ':',''), 'hh24miss'),'hh24miss')     AS TRANS_TIME                                            ");
         sb.append("                     FROM TDMS_AVI_INFO                                                          ");
         sb.append("                          WHERE OPERATION IN                                                       ");
         sb.append("                                  (SELECT GROUP_OBJECT                                           ");
@@ -1050,7 +1056,7 @@ public class JDBCExampleRepository {
         sb.append("                                          AND GROUP_INDEX = 3)                                   ");
         sb.append("                          AND CNT > 0)                                                           ");
         sb.append("         GROUP BY TURN, WAFER_ID                                                                 ");
-        sb.append("         ORDER BY WAFER_ID) A,                                                                   ");
+        sb.append("         ORDER BY  LOT_NUMBER, TURN, WAFER_ID) A,                                                                   ");
         sb.append("        ASFC_LOT_HISTORY  C, ASFC_LOT_STATUS D                                                                      ");
         sb.append("  WHERE     A.LOT_NUMBER = C.LOT_NUMBER(+)                                                       ");
         sb.append("        AND C.TRANSACTION(+) = 'SSHP'                                                            ");
@@ -1069,7 +1075,7 @@ public class JDBCExampleRepository {
         }
         if(!startDate.isEmpty())
         {
-            sb.append("             AND A.TRANS_TIME BETWEEN :startDate AND :endDate                                                      ");
+            sb.append("             AND A.TRANS_TIME >= :startDate AND A.TRANS_TIME <= :endDate                                                      ");
             
         }
         if(externalFlag.equals("Y")){
@@ -1097,6 +1103,7 @@ public class JDBCExampleRepository {
                     .turn(rs.getString("TURN"))
                     .totalProbe(rs.getInt("TOTAL_PROBE"))
                     .passProbe(rs.getInt("PASS_PROBE"))
+                    .failProbe(rs.getInt("FAIL_PROBE"))
                     .yieldProbe(rs.getDouble("YIELD_PROBE"))
                     .b2(rs.getString("B2"))
                     .b3(rs.getString("B3"))
@@ -1109,6 +1116,7 @@ public class JDBCExampleRepository {
                     .passAvi(rs.getInt("PASS_AVI"))
                     .yieldAvi(rs.getDouble("YIELD_AVI"))
                     .shipmentDate(rs.getString("SHIPMENT_DATE"))
+                    .cumYield(rs.getDouble("YIELD_CUM"))
                     .build();
         };
 

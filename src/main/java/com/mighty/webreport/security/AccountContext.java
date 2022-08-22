@@ -1,6 +1,7 @@
 package com.mighty.webreport.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mighty.webreport.domain.entity.admin.AuthorityRole;
 import com.mighty.webreport.domain.entity.admin.Member;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;

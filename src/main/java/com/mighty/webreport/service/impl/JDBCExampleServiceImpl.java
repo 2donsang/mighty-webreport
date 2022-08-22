@@ -82,8 +82,8 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
         List<AviYieldReportResponse> aviYieldReport = new ArrayList<>();
 
             List<String> dateList = transStartDate(dto.getDates().getStartDate(), dto.getDates().getEndDate());
-            String startDate = dateList.get(0);
-            String endDate = dateList.get(1);
+            String startDate = dateList.get(0).substring(0, 8);
+            String endDate = dateList.get(1).substring(0, 8);
             String customer = accountContext.getMember().getExpandFieldSix() ;
 
             aviYieldReport = jdbcExampleRepository.getAviYieldReportNew(accountContext.getPlant(), customer, dto.getLotNumbersString(),

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../../components/common/Icon';
 import StackedBar from '../../components/common/StackedBar';
+import GroupBar from '../../components/common/GroupBar';
 import VerticalBar, { IBarDataSet } from '../../components/common/VerticalBar';
 import SearchSelector from '../../components/form/SearchSelector';
 import TableForm from '../../components/form/TableForm';
@@ -15,79 +16,6 @@ import { getDateString } from '../../utils/dateUtil';
 import { getRGBA } from '../../utils/RGBAUtil';
 import * as S from './style.DailyWipTrend';
 
-const tableHeaders: TableHeader[] = [
-    // { text: "Operation", width: "130px" },
-    { text: "공정", width: "130px" },
-    { text: "1일", width: "80px" },
-    { text: "2일", width: "80px" },
-    { text: "3일", width: "80px" },
-    { text: "4일", width: "80px" },
-    { text: "5일", width: "80px" },
-    { text: "6일", width: "80px" },
-    { text: "7일", width: "80px" },
-    { text: "8일", width: "80px" },
-    { text: "9일", width: "80px" },
-    { text: "10일", width: "80px" },
-    { text: "11일", width: "80px" },
-    { text: "12일", width: "80px" },
-    { text: "13일", width: "80px" },
-    { text: "14일", width: "80px" },
-    { text: "15일", width: "80px" },
-    { text: "16일", width: "80px" },
-    { text: "17일", width: "80px" },
-    { text: "18일", width: "80px" },
-    { text: "19일", width: "80px" },
-    { text: "20일", width: "80px" },
-    { text: "21일", width: "80px" },
-    { text: "22일", width: "80px" },
-    { text: "23일", width: "80px" },
-    { text: "24일", width: "80px" },
-    { text: "25일", width: "80px" },
-    { text: "26일", width: "80px" },
-    { text: "27일", width: "80px" },
-    { text: "28일", width: "80px" },
-    { text: "29일", width: "80px" },
-    { text: "30일", width: "80px" },
-    { text: "31일", width: "80px" },
-];
-
-
-const CSVHeaders: CSVHeader[] = [
-    { label: "Operation", key: "operation" },
-    { label: "공정", key: "operationDesc" },
-    { label: "1일", key: "day1" },
-    { label: "2일", key: "day2" },
-    { label: "3일", key: "day3" },
-    { label: "4일", key: "day4" },
-    { label: "5일", key: "day5" },
-    { label: "6일", key: "day6" },
-    { label: "7일", key: "day7" },
-    { label: "8일", key: "day8" },
-    { label: "9일", key: "day9" },
-    { label: "10일", key: "day10" },
-    { label: "11일", key: "day11" },
-    { label: "12일", key: "day12" },
-    { label: "13일", key: "day13" },
-    { label: "14일", key: "day14" },
-    { label: "15일", key: "day15" },
-    { label: "16일", key: "day16" },
-    { label: "17일", key: "day17" },
-    { label: "18일", key: "day18" },
-    { label: "19일", key: "day19" },
-    { label: "20일", key: "day20" },
-    { label: "21일", key: "day21" },
-    { label: "22일", key: "day22" },
-    { label: "23일", key: "day23" },
-    { label: "24일", key: "day24" },
-    { label: "25일", key: "day25" },
-    { label: "26일", key: "day26" },
-    { label: "27일", key: "day27" },
-    { label: "28일", key: "day28" },
-    { label: "29일", key: "day29" },
-    { label: "30일", key: "day30" },
-    { label: "31일", key: "day31" },
-
-];
 
 interface IDefectStatus {
     device: string;
@@ -104,7 +32,7 @@ interface IDefectStatus {
 
 
 interface IDailyWipTrend {
-    operation: string; operationDesc: string;
+    operationDesc: string;
     day1:string; day11:string; day21:string;
     day2:string; day12:string; day22:string;
     day3:string; day13:string; day23:string;
@@ -118,13 +46,84 @@ interface IDailyWipTrend {
 
 }
 
-const labels: string[] = ['4"_M1 Scratch', '6"_Crack', '6"Chip', '6"_Scratch', 'test', '합계'];
+//const labels: string[] = ['4"_M1 Scratch', '6"_Crack', '6"Chip', '6"_Scratch', 'test', '합계'];
 const dailyLabels: string[] = [];
 
 
 const DailyWipTrend = () => {
     const langState = useSelector((state: RootState) => state.langReducer);
-    console.log(langState.isKor);
+
+    const tableHeaders: TableHeader[] = [
+        { text: langState.isKor? "공정" : "Operation" , width: "160px" },
+        { text: langState.isKor? "1일" : "1st" , width: "80px" },
+        { text: langState.isKor? "2일" : "2nd"   , width: "80px" },
+        { text: langState.isKor? "3일" : "3rd"  , width: "80px" },
+        { text: langState.isKor? "4일" : "4th"  , width: "80px" },
+        { text: langState.isKor? "5일" : "5th"  , width: "80px" },
+        { text: langState.isKor? "6일" : "6th"  , width: "80px" },
+        { text: langState.isKor? "7일" : "7th"  , width: "80px" },
+        { text: langState.isKor? "8일" : "8th"  , width: "80px" },
+        { text: langState.isKor? "9일" : "9th"  , width: "80px" },
+        { text: langState.isKor? "10일" : "10th"  , width: "80px" },
+        { text: langState.isKor? "11일" : "11th"  , width: "80px" },
+        { text: langState.isKor? "12일" : "12th"  , width: "80px" },
+        { text: langState.isKor? "13일" : "13th"  , width: "80px" },
+        { text: langState.isKor? "14일" : "14th"  , width: "80px" },
+        { text: langState.isKor? "15일" : "15th"  , width: "80px" },
+        { text: langState.isKor? "16일" : "16th"  , width: "80px" },
+        { text: langState.isKor? "17일" : "17th"  , width: "80px" },
+        { text: langState.isKor? "18일" : "18th"  , width: "80px" },
+        { text: langState.isKor? "19일" : "19th"  , width: "80px" },
+        { text: langState.isKor? "20일" : "20th"  , width: "80px" },
+        { text: langState.isKor? "21일" : "21th"  , width: "80px" },
+        { text: langState.isKor? "22일" : "22th"  , width: "80px" },
+        { text: langState.isKor? "23일" : "23th"  , width: "80px" },
+        { text: langState.isKor? "24일" : "24th"  , width: "80px" },
+        { text: langState.isKor? "25일" : "25th"  , width: "80px" },
+        { text: langState.isKor? "26일" : "26th"  , width: "80px" },
+        { text: langState.isKor? "27일" : "27th"  , width: "80px" },
+        { text: langState.isKor? "28일" : "28th"  , width: "80px" },
+        { text: langState.isKor? "29일" : "29th"  , width: "80px" },
+        { text: langState.isKor? "30일" : "30th"  , width: "80px" },
+        { text: langState.isKor? "31일" : "31th"  , width: "80px" },
+    ];
+
+    const CSVHeaders: CSVHeader[] = [
+        { label: langState.isKor? "공정" : "Operation"  , key: "operationDesc" },
+        { label: langState.isKor? "1일" : "1st" , key: "day1" },
+        { label: langState.isKor? "2일" : "2nd" , key: "day2" },
+        { label: langState.isKor? "3일" : "3rd" , key: "day3" },
+        { label: langState.isKor? "4일" : "4th" , key: "day4" },
+        { label: langState.isKor? "5일" : "5th" , key: "day5" },
+        { label: langState.isKor? "6일" : "6th" , key: "day6" },
+        { label: langState.isKor? "7일" : "7th" , key: "day7" },
+        { label: langState.isKor? "8일" : "8th" , key: "day8" },
+        { label: langState.isKor? "9일" : "9th" , key: "day9" },
+        { label: langState.isKor? "10일" : "10th", key: "day10" },
+        { label: langState.isKor? "11일" : "11th", key: "day11" },
+        { label: langState.isKor? "12일" : "12th", key: "day12" },
+        { label: langState.isKor? "13일" : "13th", key: "day13" },
+        { label: langState.isKor? "14일" : "14th", key: "day14" },
+        { label: langState.isKor? "15일" : "15th", key: "day15" },
+        { label: langState.isKor? "16일" : "16th", key: "day16" },
+        { label: langState.isKor? "17일" : "17th", key: "day17" },
+        { label: langState.isKor? "18일" : "18th", key: "day18" },
+        { label: langState.isKor? "19일" : "19th", key: "day19" },
+        { label: langState.isKor? "20일" : "20th", key: "day20" },
+        { label: langState.isKor? "21일" : "21th", key: "day21" },
+        { label: langState.isKor? "22일" : "22th", key: "day22" },
+        { label: langState.isKor? "23일" : "23th", key: "day23" },
+        { label: langState.isKor? "24일" : "24th", key: "day24" },
+        { label: langState.isKor? "25일" : "25th", key: "day25" },
+        { label: langState.isKor? "26일" : "26th", key: "day26" },
+        { label: langState.isKor? "27일" : "27th", key: "day27" },
+        { label: langState.isKor? "28일" : "28th", key: "day28" },
+        { label: langState.isKor? "29일" : "29th", key: "day29" },
+        { label: langState.isKor? "30일" : "30th", key: "day30" },
+        { label: langState.isKor? "31일" : "31th", key: "day31" },
+    
+    ];
+
     // 제품, LOT 번호, 공정, LOT Status
     const [isLookDown, setIsLookDown] = useState(true);
     const [devices, setDevices] = useState<ISearchBox[]>([]);
@@ -134,7 +133,6 @@ const DailyWipTrend = () => {
     const [operations, setOperations] = useState<ISearchBox[]>([]);
     const [checkedOperations, setCheckedOperations] = useState<ISearchBox[]>([]);
     const [isTable, setIsTable] = useState(true);
-    const [defectByLotNumber, setDefectByLotNumber] = useState<IBarDataSet[]>([]);
     const [dailyWipTrend, setDailyWipTrend] = useState<IBarDataSet[]>([]);
     const [tableBodies, setTableBodies] = useState<JSX.Element>((<tbody></tbody>));
     const [searchData, setSearchData] = useState<IDailyWipTrend[]>([]);
@@ -188,23 +186,16 @@ const DailyWipTrend = () => {
             })
             console.log(dailyLabels);
 
-            //그리드 컬럼해더 세팅
-            // newTableHeader.splice(0, newTableHeader.length);
-            // newTableHeader.push({ text: "operation", width: "130px" });
-            // newTableHeader.push({ text: "공정", width: "130px" });
-            // dailyWipColumnNames.map((element) => {
-            //     newTableHeader.push({
-            //         text: element.naturalDate,
-            //         width: "100px"
-            //     })
-            // })
-            // setNewTableHeader(newTableHeader);
-
             const res = await ApiUtil.post("/search/daily-wip-trend", params);
             //debugger
             
             if (res.data.dailyWipTrend.length == 0) {
-                dispatch(showAlertModal("확인메세지", "데이터", "가 없습니다."));
+                if(langState.isKor)
+                {
+                    dispatch(showAlertModal("확인메세지","데이터","가 없습니다."));
+                }else{
+                    dispatch(showAlertModal("Information","Data"," does not exist."));
+                }
             }
             setSearchData(res.data.dailyWipTrend);
 
@@ -249,12 +240,22 @@ const DailyWipTrend = () => {
         callAPI();
     }, [devices, operations, lotNumbers])
 
+    useEffect(() =>{
+            // //그리드 컬럼해더 세팅
+            // newTableHeader.splice(0, newTableHeader.length);
+            // newTableHeader.push({ text: "공정", width: "130px" });
+            // dailyWipColumnNames.map((element) => {
+            //     newTableHeader.push({
+            //         text: element.naturalDate,
+            //         width: "100px"
+            //     })
+            // })
+            // setNewTableHeader(newTableHeader);
+    },[dailyWipColumnNames])
 
     useEffect(() => {
-
         dailyWipTrend.splice(0, dailyWipTrend.length);
         searchData.map((element, index) => {
-            console.log(searchData);
             dailyWipTrend.push({
                 label: element.operationDesc,
                 data: [
@@ -360,7 +361,6 @@ const DailyWipTrend = () => {
             day31 += Number(array.day31);
         })
         searchData.splice(0, 0, {
-            operation: "",
             operationDesc: "Total",
             day1: day1.toString(),
             day2: day2.toString(),
@@ -439,8 +439,7 @@ const DailyWipTrend = () => {
                     <React.Fragment
                         key={"body" + index}
                     >
-                        <tr>
-                            {/* <td><span>{element.operation}</span></td> */}
+                        <tr>                           
                             <td><span>{element.operationDesc}</span></td>
                             <td><span>{element.day1}</span></td>
                             <td><span>{element.day2}</span></td>
@@ -513,10 +512,15 @@ const DailyWipTrend = () => {
                     <div className="chart-container">
                         <div className="charts">
                             <StackedBar
-                                title="일별 재공 추이도"
+                                title= {langState.isKor? "일자별 재공 추이도" : "Daily Wip Trend"}
                                 labels={dailyLabels}
                                 datasets={dailyWipTrend}
                             />
+                              {/* <GroupBar
+                                title= {langState.isKor? "일자별 재공 추이도" : "Daily Wip Trend"}
+                                labels={dailyLabels}
+                                datasets={dailyWipTrend}
+                            /> */}
                         </div>
                         <div className="chart-menu">
                             <Icon
@@ -531,8 +535,8 @@ const DailyWipTrend = () => {
                     <div className="tableForm">
                         <TableForm
                             name="DailyWipTrend"
-                            //tableHeaders={tableHeaders}
-                            tableHeaders={newTableHeader}
+                            tableHeaders={tableHeaders}
+                            //tableHeaders={newTableHeader}
                             tableBodies={tableBodies}
                             CSVHeaders={CSVHeaders}
                             CSVData={searchData}
