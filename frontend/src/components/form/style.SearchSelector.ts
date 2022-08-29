@@ -2,7 +2,7 @@ import styled from "styled-components";
 import color from "../../styles/color";
 
 export const Container = styled.div`
-  border: 1px solid ${color.lightgray};
+  border: 3px solid ${color.lightgray};
   //resize: horizontal;
   position: relative;
   margin-right: 10px;
@@ -13,7 +13,8 @@ export const Container = styled.div`
   min-width: 230px;
   border-radius: 10px;
   .header{
-    font-size : 1.1rem;
+    // font-size : 1.3em;
+    font-size : 15px;
     margin-bottom: 5px;
   }
   .change-container{
@@ -50,6 +51,7 @@ export const Container = styled.div`
       border-bottom: 2px solid ${color.lightgray};
     }
     ul{
+      font-size : 12px;
       background-color: white;
       position: absolute;
       width: 100%;
@@ -72,7 +74,7 @@ export const Container = styled.div`
         height: 20px;
         bold{
           color: ${color.red};
-        }
+        }       
       }
       li.focus-item{
         background-color: ${color.lightgray};
@@ -101,6 +103,7 @@ export const Container = styled.div`
     width: 100%;
     overflow-y: auto;
     list-style-position:inside;
+    font-size: 12px;
     li{
       cursor: pointer;
       padding: 2px 10px;

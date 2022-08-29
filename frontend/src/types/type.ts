@@ -24,6 +24,12 @@ export interface ISearchBox {
     condition?: string;
 }
 
+export interface IDropDown{
+    value:string,
+    label:string,
+    color?:string,
+}
+
 export interface IAlert {
     show: boolean;
     header?: string;

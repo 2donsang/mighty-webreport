@@ -8,8 +8,9 @@ export const Container = styled.div<{isLookDown:boolean}>`
         `form{
             display : flex;
             flex-direction : column;
-            .condition_container{                            
-                display: flex;
+            .condition_container{                        
+                display : grid;
+                grid-template-columns : 300px 300px 300px 1fr;
             }
         }`
         :
@@ -17,9 +18,9 @@ export const Container = styled.div<{isLookDown:boolean}>`
             display : flex;
             flex-direction : row;
             .condition_container{
-                display : grid;
-                grid-template-columns : 1fr;
-                grid-template-rows: repeat(4, minmax(100px, auto));
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
             }     
         }`
         

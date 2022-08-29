@@ -118,9 +118,11 @@ public class JDBCExampleServiceImpl implements JDBCExampleService {
             String startDate = dateList.get(0);
             String endDate = dateList.get(1);
             String customer = accountContext.getMember().getExpandFieldSix();
+            String checkedOne = dto.getCheckBoxOne().toString(); // PTEST, AVI 둘다 있는 데이터만 보기
+            String inputTextOne = dto.getInputTextOne(); // 기준수율 입력한 숫자 이하 수율만 보기
 
             totalYieldReport = jdbcExampleRepository.getTotalYieldReport(accountContext.getPlant(), customer, dto.getLotNumbersString(),
-                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate, accountContext.getMember().getExternalFlag());
+                    dto.getOperationsString(), dto.getDevicesString(), startDate, endDate, accountContext.getMember().getExternalFlag(), checkedOne, inputTextOne);
 
         hashMap.put("totalYieldReport", totalYieldReport);
     }

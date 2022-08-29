@@ -185,6 +185,8 @@ export interface TurnCol{
 
 export interface TotalCol{
     rowCount: number;
+    rowCountTwo?: number;
+    rowCountThree?: number;
     TransTime?: string | null;   
     deviceName: string;   
     lotNumber?: string |null;

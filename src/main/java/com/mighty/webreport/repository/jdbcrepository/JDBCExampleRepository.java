@@ -31,35 +31,6 @@ public class JDBCExampleRepository {
     public List<LotStatusResponse> getLotStatus(String plant, String customer, String lotNumbers, String operations, String devices, String startDate, String endDate, String externalFlag) {
         StringBuilder sql  = new StringBuilder();
 
-//        sql.append("select   get_operation_desc(a.plant,a.operation) as operation,");
-//        sql.append("         a.lot_number,");
-//        sql.append("         a.main_lot,");
-//        sql.append("         decode(a.qty1_unit,'WFS',a.qty1,'PCS',0) as qty1,");
-//        sql.append("         a.qty1_unit,");
-//        sql.append("         nvl(decode(a.qty2_unit,'PCS',a.qty2),a.qty1) as qty2,");
-//        sql.append("         a.qty2_unit,");
-//        sql.append("         get_device_desc(a.plant,a.device) as device,");
-//        sql.append("         get_customer_name_only(a.plant, a.customer) as customer,");
-//        sql.append("         in_hold,hold_note,");
-//        sql.append("         in_rework, ");
-//        sql.append("         case when process_flag = 'Q' then '대기' ");
-//        sql.append("              when process_flag = 'P' then '작업' ");
-//        sql.append("              when process_flag = 'S' then '완료대기' ");
-//        sql.append("         else '?'   ");
-//        sql.append("          end  as process_flag ,");
-//        sql.append("       (select attribute_value from asfc_attribute_status where plant = a.plant and lot_number = a.lot_number and attribute_index = 1) as device_ver,");
-//        sql.append("       (select attribute_value from asfc_attribute_status where plant = a.plant and lot_number = a.lot_number and attribute_index = 2) as device_attribute,");
-//        sql.append("       (select attribute_value from asfc_attribute_status where plant = a.plant and lot_number = a.lot_number and attribute_index = 3) as ship_attribute, ");
-//        sql.append("         route, ");
-//        sql.append("         to_char(to_date(a.enter_oper_time, 'YYYYMMDDHH24MISS'),'yyyy-mm-dd') enter_oper_time,");
-//        sql.append("         b.equipment_id ");
-//        sql.append(" from asfc_lot_status a,");
-//        sql.append("      asfc_eqplot_status b ");
-//        sql.append("where a.plant = :plant ");
-//        sql.append("  and a.plant = b.plant(+)");
-//        sql.append("  and a.lot_number = b.lot_number(+)");
-//        sql.append("  and status <> '99' ");
-
         sql.append("   SELECT GET_DEVICE_DESC (A.PLANT, A.DEVICE)                                               ");
         sql.append("              AS DEVICE,                                                                    ");
         sql.append("          A.LOT_NUMBER,                                                                     ");
@@ -94,7 +65,8 @@ public class JDBCExampleRepository {
         sql.append("          TO_CHAR (TO_DATE (B.FORECAST_EDATE, 'YYYYMMDDHH24MISS'), 'yyyy-mm-dd')            ");
         sql.append("              AS FORECAST_EDATE                                                             ");
         sql.append("     FROM ASFC_LOT_STATUS A, ASFC_PROD_PLAN_DATA B                                          ");
-        sql.append("    WHERE     A.PLANT = :plant                                                              ");
+//        sql.append("    WHERE     A.PLANT = :plant                                                              ");
+        sql.append("    WHERE     1=1                                                                           ");
         sql.append("          AND A.PLANT = B.PLANT                                                             ");
         sql.append("          AND A.LOT_NUMBER = B.PROD_ORDER_NO                                                ");
         sql.append("          AND B.STATUS = 'S'                                                                ");
@@ -553,7 +525,7 @@ public class JDBCExampleRepository {
         sb.append("          A.HEADER_10     AS FAILCOUNT                          ");
         sb.append("     FROM TDMS_AVI_INFO A, ASFC_LOT_STATUS B          ");
         sb.append("    WHERE A.PLANT = :plant                                      ");
-        sb.append("      AND CNT > 0                                               ");
+        sb.append("      AND TO_NUMBER(CNT) > 0                                               ");
         sb.append("      AND  A.PLANT = B.PLANT                                      ");
         sb.append("      AND A.LOT_NUMBER = B.LOT_NUMBER                            ");
         sb.append("     AND A.OPERATION IN                                         ");
@@ -584,7 +556,7 @@ public class JDBCExampleRepository {
             sb.append(" AND TO_CHAR(TO_DATE(A.HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD')>=:startDate AND TO_CHAR(TO_DATE(A.HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD') <= :endDate          ");
         }
 
-        sb.append(" ORDER BY TRANSTIME, TO_NUMBER (CNT)                                       ");
+        sb.append(" ORDER BY TESTDATE, LOT_NUMBER,TURN, WAFER_ID                ");
 
 
 
@@ -879,19 +851,21 @@ public class JDBCExampleRepository {
 
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT                                                                              ");
-        sb.append("   TO_CHAR(TO_DATE(A.TRANS_TIME,'YYYYMMDDHH24MISS'),'YYYY-MM-DD') TRANS_TIME         ");
+        sb.append("   TO_CHAR(TO_DATE(A.TESTDATE,'YYYYMMDDHH24MISS'),'YYYY-MM-DD') AS TRANS_TIME         ");
         sb.append(" , GET_DEVICE_DESC(A.PLANT,A.DEVICE) DEVICE                                          ");
         sb.append(" ,A.LOT_NUMBER                                                                        ");
         sb.append(" ,A.WAFER_ID                                                                          ");
         sb.append(" , GET_OPERATION_DESC_ONLY(A.PLANT,A.OPERATION) OPERATION                             ");
         sb.append(" ,A.TURN                                                                              ");
-        sb.append(" ,TRUNC(YIELD,2) AS YIELD                                                             ");
+//        sb.append(" ,DECODE(REGEXP_INSTR(A.YIELD,'^[+-]?\\d*(\\.?\\d*)$'),1,TRUNC(A.YIELD,2),0,'0') AS YIELD ");
+        sb.append(" ,TRUNC(A.YIELD,2) AS YIELD                                                           ");
         sb.append(" ,A.TESTCOUNT                                                                         ");
         sb.append(" ,A.PASSCOUNT                                                                         ");
         sb.append(" ,A.FAILCOUNT                                                                         ");
         sb.append(" ,A.TESTDATE                                                                           ");
         sb.append(" FROM TDMS_PROBE_SPEC_HEADER A, ASFC_LOT_STATUS B   ");
         sb.append(" WHERE A.PLANT = :plant                                       ");
+        sb.append("     AND REGEXP_INSTR(A.YIELD,'^[+-]?\\d*(\\.?\\d*)$') = 1      ");
         sb.append("     AND A.PLANT = B.PLANT                                     ");
         sb.append("     AND A.LOT_NUMBER = B.LOT_NUMBER                          ");
 //        sb.append("     AND A.OPERATION IN                                       ");
@@ -918,8 +892,10 @@ public class JDBCExampleRepository {
             sb.append(" AND A.OPERATION IN ("+operations+")"                       );
         }
         if(!startDate.isEmpty()){
-            sb.append(" AND A.TRANS_TIME BETWEEN :startDate AND :endDate            ");
+            sb.append(" AND TO_CHAR(TO_DATE(A.TESTDATE, 'yyyymmddhh24miss'), 'YYYYMMDD')>=:startDate AND TO_CHAR(TO_DATE(A.TESTDATE, 'yyyymmddhh24miss'), 'YYYY-MM-DD') <=:endDate            ");
         }
+
+        sb.append("ORDER BY TO_CHAR(TO_DATE(A.TESTDATE, 'yyyymmddhh24miss'), 'YYYYMMDD'), A.LOT_NUMBER, A.TURN, A.WAFER_ID");
 
 
         String query = sb.toString();
@@ -951,148 +927,115 @@ public class JDBCExampleRepository {
 
     public List<TotalYieldReportResponse> getTotalYieldReport(String plant, String customer,
                                                               String lotNumbers, String operations, String devices,
-                                                              String startDate, String endDate, String externalFlag) {
+                                                              String startDate, String endDate, String externalFlag, String checkedOne, String inputTextOne) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(" SELECT                                                                                          ");
-        sb.append("        (SELECT DESCRIPTION FROM ADM_DEVICE WHERE DEVICE = A.DEVICE) DEVICE,                     ");
-        sb.append("        A.LOT_NUMBER,                                                                            ");
-        sb.append("        A.WAFER_ID,                                                                              ");
-        sb.append("        A.TURN,                                                                                  ");
-        sb.append("        A.TOTAL_PROBE,                                                                           ");
-        sb.append("        A.PASS_PROBE,                                                                            ");
-        sb.append("        A.FAIL_PROBE,                                                                            ");
-        sb.append("        A.YIELD_PROBE,                                                                           ");
-        sb.append("        A.B2,                                                                                    ");
-        sb.append("        A.B3,                                                                                    ");
-        sb.append("        A.B4,                                                                                    ");
-        sb.append("        A.B5,                                                                                    ");
-        sb.append("        A.B6,                                                                                    ");
-        sb.append("        A.B7,                                                                                    ");
-        sb.append("        A.B8,                                                                                    ");
-        sb.append("        A.TOTAL_AVI,                                                                             ");
-        sb.append("        A.PASS_AVI,                                                                              ");
-        sb.append("        A.YIELD_AVI,                                                                             ");
-        sb.append("        TO_CHAR (TO_DATE (C.TRANS_TIME, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD')    AS SHIPMENT_DATE,   ");
-        sb.append("        A.YIELD_CUM                                                                              ");
-        sb.append("   FROM (  SELECT MAX (DEVICE)         AS DEVICE,                                                ");
-        sb.append("                  MAX (LOT_NUMBER)     AS LOT_NUMBER,                                            ");
-        sb.append("                  WAFER_ID,                                                                      ");
-        sb.append("                  TURN,                                                                          ");
-        sb.append("                  MAX (TO_NUMBER(TESTCOUNT))      AS TOTAL_PROBE,                                           ");
-        sb.append("                  MAX (TO_NUMBER(PASSCOUNT))      AS PASS_PROBE,                                            ");
-        sb.append("                  MAX (TO_NUMBER(FAILCOUNT))      AS FAIL_PROBE,                                            ");
-        sb.append("                  MAX (TO_NUMBER(TRUNC(YIELD_PROBE,2)))      AS YIELD_PROBE,                                           ");
-        sb.append("                  MAX (TO_NUMBER(B2))             AS B2,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B3))             AS B3,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B4))             AS B4,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B5))             AS B5,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B6))             AS B6,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B7))             AS B7,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(B8))             AS B8,                                                    ");
-        sb.append("                  MAX (TO_NUMBER(TOTAL_AVI))      AS TOTAL_AVI,                                             ");
-        sb.append("                  MAX (TO_NUMBER(PASS_AVI))       AS PASS_AVI,                                              ");
-        sb.append("                  MAX (TO_NUMBER(YIELD_AVI))      AS YIELD_AVI,                                             ");
-        sb.append("                  MAX (TRANS_TIME)     AS TRANS_TIME,                                             ");
-        sb.append(" CASE WHEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) <>0 AND MAX(TO_NUMBER(YIELD_AVI))<>0 THEN TRUNC((MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2)))/100 * MAX(TO_NUMBER(YIELD_AVI))/100)*100,2) ");
-        sb.append("                 WHEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) =0 OR MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) IS NULL THEN MAX(TO_NUMBER(YIELD_AVI))                                      ");
-        sb.append("                 WHEN MAX(TO_NUMBER(YIELD_AVI)) =0 OR MAX(TO_NUMBER(YIELD_AVI)) IS NULL THEN MAX(TO_NUMBER(TRUNC(YIELD_PROBE,2))) ELSE 0 END AS YIELD_CUM                         ");
-        sb.append("             FROM (SELECT DEVICE,                                                                ");
-        sb.append("                          LOT_NUMBER,                                                            ");
-        sb.append("                          WAFER_ID,                                                              ");
-        sb.append("                          OPERATION,                                                             ");
-        sb.append("                          TURN,                                                                  ");
-        sb.append("                          TESTCOUNT,                                                             ");
-        sb.append("                          PASSCOUNT,                                                             ");
-        sb.append("                          FAILCOUNT,                                                             ");
-        sb.append("                          YIELD AS YIELD_PROBE,                                                             ");
-        sb.append("                          B2,                                                                    ");
-        sb.append("                          B3,                                                                    ");
-        sb.append("                          B4,                                                                    ");
-        sb.append("                          B5,                                                                    ");
-        sb.append("                          B6,                                                                    ");
-        sb.append("                          B7,                                                                    ");
-        sb.append("                          B8,                                                                    ");
-        sb.append("                          ''     AS TOTAL_AVI,                                                   ");
-        sb.append("                          ''     AS PASS_AVI,                                                    ");
-        sb.append("                          ''     AS YIELD_AVI,                                                   ");
-        sb.append("                          TRANS_TIME                                                             ");
-        sb.append("                     FROM TDMS_PROBE_SPEC_HEADER                                                 ");
-        sb.append("                          WHERE OPERATION IN                                                       ");
-        sb.append("                                  (SELECT GROUP_OBJECT                                           ");
-        sb.append("                                     FROM ADM_GROUP_CATEGORY_DATA                                ");
-        sb.append("                                    WHERE     PLANT = 'SAWNICS'                                  ");
-        sb.append("                                          AND GROUP_TARGET = 'OPERATION'                         ");
-        sb.append("                                          AND GROUP_VALUE = 'PTEST'                              ");
-        sb.append("                                          AND GROUP_INDEX = 3)                                   ");
-        sb.append("                   UNION ALL                                                                     ");
-        sb.append("                   SELECT DEVICE,                                                                ");
-        sb.append("                          LOT_NUMBER,                                                            ");
-        sb.append("                          HEADER_5 AS WAFER_ID,                                                  ");
-        sb.append("                          OPERATION,                                                             ");
-        sb.append("                          TURN,                                                                  ");
-        sb.append("                          '' AS TESTCOUNT,                                                       ");
-        sb.append("                          '' AS PASSCOUNT,                                                       ");
-        sb.append("                          '' AS FAILCOUNT,                                                       ");
-        sb.append("                          '' AS YIELD_PROBE,                                                     ");
-        sb.append("                          '' AS B2,                                                              ");
-        sb.append("                          '' AS B3,                                                              ");
-        sb.append("                          '' AS B4,                                                              ");
-        sb.append("                          '' AS B5,                                                              ");
-        sb.append("                          '' AS B6,                                                              ");
-        sb.append("                          '' AS B7,                                                              ");
-        sb.append("                          '' AS B8,                                                              ");
-        sb.append("                          HEADER_7 AS TOTAL_AVI,                                                 ");
-        sb.append("                          HEADER_8 AS PASS_AVI,                                                  ");
-        sb.append("                          HEADER_9 AS YIELD_AVI,                                                 ");
-        sb.append("                          TO_CHAR(TO_DATE(HEADER_1, 'YYYY.MM.DD'), 'YYYYMMDD') || TO_CHAR(TO_DATE(REPLACE(HEADER_2, ':',''), 'hh24miss'),'hh24miss')     AS TRANS_TIME                                            ");
-        sb.append("                     FROM TDMS_AVI_INFO                                                          ");
-        sb.append("                          WHERE OPERATION IN                                                       ");
-        sb.append("                                  (SELECT GROUP_OBJECT                                           ");
-        sb.append("                                     FROM ADM_GROUP_CATEGORY_DATA                                ");
-        sb.append("                                    WHERE     PLANT = 'SAWNICS'                                  ");
-        sb.append("                                          AND GROUP_TARGET = 'OPERATION'                         ");
-        sb.append("                                          AND GROUP_VALUE = 'AVI'                                ");
-        sb.append("                                          AND GROUP_INDEX = 3)                                   ");
-        sb.append("                          AND CNT > 0)                                                           ");
-        sb.append("         GROUP BY TURN, WAFER_ID                                                                 ");
-        sb.append("         ORDER BY  LOT_NUMBER, TURN, WAFER_ID) A,                                                                   ");
-        sb.append("        ASFC_LOT_HISTORY  C, ASFC_LOT_STATUS D                                                                      ");
-        sb.append("  WHERE     A.LOT_NUMBER = C.LOT_NUMBER(+)                                                       ");
-        sb.append("        AND C.TRANSACTION(+) = 'SSHP'                                                            ");
-        sb.append("  AND A.LOT_NUMBER = D.LOT_NUMBER                                                                ");
+        sb.append(" SELECT A.*                                                                                                                                                                                      ");
+        sb.append("        ,TO_CHAR (TO_DATE (B.TRANS_TIME, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD') AS SHIPMENT_DATE                                                                                                     ");
+        sb.append(" FROM                                                                                                                                                                                            ");
+        sb.append(" (SELECT GET_DEVICE_DESC(MAX(PLANT),MAX(DEVICE)) AS DEVICE                                                                                                                                       ");
+        sb.append("         , MAX(LOT_NUMBER) AS LOT_NUMBER                                                                                                                                                         ");
+        sb.append("         , WAFER_ID                                                                                                                                                                              ");
+        sb.append("         , TO_CHAR(TURN) AS TURN                                                                                                                                                                 ");
+        sb.append("         , MAX(TO_NUMBER(TESTCOUNT)) AS TESTCOUNT                                                                                                                                                ");
+        sb.append("         , MAX(TO_NUMBER(PASSCOUNT)) AS PASSCOUNT                                                                                                                                                ");
+        sb.append("         , MAX(TO_NUMBER(FAILCOUNT)) AS FAILCOUNT                                                                                                                                                ");
+        sb.append("         , MAX(TO_NUMBER(TRUNC(YIELD, 2))) AS YIELD_PTEST                                                                                                                                        ");
+        sb.append("         , MAX(TO_NUMBER(B2)) AS B2                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B3)) AS B3                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B4)) AS B4                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B5)) AS B5                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B6)) AS B6                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B7)) AS B7                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(B8)) AS B8                                                                                                                                                              ");
+        sb.append("         , MAX(TO_NUMBER(TOTAL_AVI)) AS TOTAL_AVI                                                                                                                                                ");
+        sb.append("         , MAX(TO_NUMBER(PASS_AVI)) AS PASS_AVI                                                                                                                                                  ");
+        sb.append("         , MAX(TO_NUMBER(NVL(TRUNC(YIELD_AVI,2),0))) AS YIELD_AVI                                                                                                                                ");
+        sb.append("         , CASE WHEN MAX(TO_NUMBER(TRUNC(YIELD, 2))) <> 0 AND MAX(TO_NUMBER(YIELD_AVI)) <> 0 THEN TRUNC((MAX(TO_NUMBER(TRUNC(YIELD, 2))) / 100 * MAX(TO_NUMBER(YIELD_AVI)) / 100) * 100, 2)      ");
+        sb.append("                WHEN MAX(TO_NUMBER(TRUNC(YIELD, 2))) = 0 OR MAX(TO_NUMBER(TRUNC(YIELD, 2))) IS NULL THEN MAX(TO_NUMBER(YIELD_AVI))                                                               ");
+        sb.append("                WHEN MAX(TO_NUMBER(YIELD_AVI)) = 0 OR MAX(TO_NUMBER(YIELD_AVI)) IS NULL THEN MAX(TO_NUMBER(TRUNC(YIELD, 2))) ELSE 0 END AS YIELD_CUM                                             ");
+        sb.append(" FROM                                                                                                                                                                                            ");
+        sb.append(" (                                                                                                                                                                                               ");
+        sb.append("      SELECT PLANT, DEVICE, LOT_NUMBER, WAFER_ID, OPERATION, TURN, YIELD,  TESTCOUNT, PASSCOUNT, FAILCOUNT, B2, B3, B4, B5, B6, B7, B8, '' AS TOTAL_AVI, '' AS PASS_AVI, '' AS YIELD_AVI         ");
+        sb.append("      FROM TDMS_PROBE_SPEC_HEADER                                                                                                                                                                ");
+        sb.append("      WHERE PLANT =:plant                                                                                                                                                                        ");
+        sb.append("      AND REGEXP_INSTR(YIELD,'^[+-]?\\d*(\\.?\\d*)$') = 1                                                                                                                                        "); //정규식 숫자(소수형포함)만
+        sb.append("      AND OPERATION IN (SELECT GROUP_OBJECT                                                                                                                                                      ");
+//        sb.append("      SELECT A.PLANT, A.DEVICE, A.LOT_NUMBER, A.WAFER_ID, A.OPERATION, A.TURN, A.YIELD,  A.TESTCOUNT, A.PASSCOUNT, A.FAILCOUNT, A.B2, A.B3, A.B4, A.B5, A.B6, A.B7, A.B8, A.'' AS TOTAL_AVI, A.'' AS PASS_AVI, A.'' AS YIELD_AVI         ");
+//        sb.append("      FROM TDMS_PROBE_SPEC_HEADER A                                                                                                                                                              ");
+//        sb.append("      WHERE A.PLANT =:plant                                                                                                                                                                        ");
+//        sb.append("      AND REGEXP_INSTR(A.YIELD,'^[+-]?\\d*(\\.?\\d*)$') = 1                                                                                                                                        ");
+//        sb.append("      AND A.OPERATION IN (SELECT GROUP_OBJECT                                                                                                                                                      ");
+
+        sb.append("                                                          FROM ADM_GROUP_CATEGORY_DATA                                                                                                           ");
+        sb.append("                                                          WHERE PLANT =:plant                                                                                                                    ");
+        sb.append("                                                          AND GROUP_TARGET = 'OPERATION'                                                                                                         ");
+        sb.append("                                                          AND GROUP_VALUE = 'PTEST'                                                                                                              ");
+        sb.append("                                                          AND GROUP_INDEX = 3)                                                                                                                   ");
+
+//        sb.append("    AND A.TURN = (SELECT MAX(TURN) FROM TDMS_PROBE_SPEC_HEADER WHERE PLANT = A.PLANT AND LOT_NUMBER = A.LOT_NUMBER AND WAFER_ID = A.WAFER_ID AND OPERATION = A.OPERATION) ");
+
+        sb.append("      UNION ALL                                                                                                                                                                                  ");
+
+        sb.append("      SELECT PLANT, DEVICE, LOT_NUMBER, HEADER_5, OPERATION, TURN, '', '', '', '', '', '', '', '', '', '', '', HEADER_7, HEADER_8, HEADER_9                                                      ");
+        sb.append("      FROM TDMS_AVI_INFO                                                                                                                                                                         ");
+        sb.append("      WHERE PLANT =:plant  AND OPERATION IN (SELECT GROUP_OBJECT                                                                                                                                 ");
+//        sb.append("      SELECT A.PLANT, A.DEVICE, A.LOT_NUMBER, A.HEADER_5, A.OPERATION, A.TURN, A.'', A.'', A.'', A.'', A.'', A.'', A.'', A.'', A.'', A.'', A.'', A.HEADER_7, A.HEADER_8, A.HEADER_9                                                      ");
+//        sb.append("      FROM TDMS_AVI_INFO A                                                                                                                                                                         ");
+//        sb.append("      WHERE A.PLANT =:plant  AND OPERATION IN (SELECT GROUP_OBJECT                                                                                                                                 ");
+
+        sb.append("                                                          FROM ADM_GROUP_CATEGORY_DATA                                                                                                           ");
+        sb.append("                                                          WHERE PLANT =:plant                                                                                                                    ");
+        sb.append("                                                          AND GROUP_TARGET = 'OPERATION'                                                                                                         ");
+        sb.append("                                                          AND GROUP_VALUE = 'AVI'                                                                                                                ");
+        sb.append("                                                          AND GROUP_INDEX = 3)                                                                                                                   ");
+
+        sb.append("          AND TO_NUMBER(CNT) > 0                                                                                                                                                                            ");
+//        sb.append("  AND A.TURN = (SELECT MAX(TURN) FROM TDMS_AVI_INFO WHERE PLANT = A.PLANT AND LOT_NUMBER = A.LOT_NUMBER AND HEADER_5 = A.HEADER_5 AND OPERATION = A.OPERATION AND TO_NUMBER(A.CNT)>0) ");
+
+        sb.append(" ) A                                                                                                                                                                                             ");
+        sb.append(" GROUP BY TURN, WAFER_ID                                                                                                                                                                         ");
+        sb.append(" ORDER BY TOTAL_AVI,LOT_NUMBER, TURN, WAFER_ID) A                                                                                                                                                ");
+        sb.append(" , ASFC_LOT_HISTORY B                                                                                                                                                                            ");
+        sb.append(" , ASFC_LOT_STATUS C                                                                                                                                                                             ");
+        sb.append(" WHERE A.LOT_NUMBER = B.LOT_NUMBER(+)                                                                                                                                                            ");
+        sb.append("  AND B.TRANSACTION(+) = 'SSHP'                                                                                                                                                                  ");
+        sb.append(" AND A.LOT_NUMBER = C.LOT_NUMBER                                                                                                                                                                 ");
 
         if(!devices.isEmpty())
         {
             sb.append("             AND A.DEVICE IN ("+devices+")                                                                         ");
-            
+
         }
 
         if(!lotNumbers.isEmpty())
         {
             sb.append("             AND A.LOT_NUMBER IN ("+lotNumbers+")                                                                    ");
-            
-        }
-        if(!startDate.isEmpty())
-        {
-            sb.append("             AND A.TRANS_TIME >= :startDate AND A.TRANS_TIME <= :endDate                                                      ");
-            
+
         }
         if(externalFlag.equals("Y")){
             if(customer !=null && !customer.isEmpty()){
-                    sb.append(" AND D.CUSTOMER = :customer   ");
+                    sb.append(" AND C.CUSTOMER = :customer   ");
             }else{
-                sb.append(" AND D.CUSTOMER = ''   ");
+                sb.append(" AND C.CUSTOMER = ''   ");
             }
         }
-        
+        if(!inputTextOne.isEmpty()){
+            sb.append(" AND A.YIELD_CUM <= :inputTextOne    ");
+        }
+        if(checkedOne =="true"){
+            sb.append(" AND A.YIELD_PTEST IS NOT NULL   ");
+            sb.append(" AND A.YIELD_AVI IS NOT NULL     ");
+        }
+
 
 
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("plant",plant)
                 .addValue("startDate",startDate)
                 .addValue("endDate", endDate)
-                .addValue("customer", customer);
+                .addValue("customer", customer)
+                .addValue("inputTextOne", inputTextOne)
                 ;
 
         RowMapper<TotalYieldReportResponse> totalYieldReportResponseRowMapper = (rs, rowNum) -> {
@@ -1101,10 +1044,10 @@ public class JDBCExampleRepository {
                     .lotNumber(rs.getString("LOT_NUMBER"))
                     .waferId(rs.getString("WAFER_ID"))
                     .turn(rs.getString("TURN"))
-                    .totalProbe(rs.getInt("TOTAL_PROBE"))
-                    .passProbe(rs.getInt("PASS_PROBE"))
-                    .failProbe(rs.getInt("FAIL_PROBE"))
-                    .yieldProbe(rs.getDouble("YIELD_PROBE"))
+                    .totalProbe(rs.getInt("TESTCOUNT"))
+                    .passProbe(rs.getInt("PASSCOUNT"))
+                    .failProbe(rs.getInt("FAILCOUNT"))
+                    .yieldProbe(rs.getDouble("YIELD_PTEST"))
                     .b2(rs.getString("B2"))
                     .b3(rs.getString("B3"))
                     .b4(rs.getString("B4"))
@@ -1122,6 +1065,7 @@ public class JDBCExampleRepository {
 
         List<TotalYieldReportResponse> totalYieldReportResponses = new ArrayList<>();
         try {
+
             totalYieldReportResponses = namedParameterJdbcTemplate.query(sb.toString(),sqlParameterSource,totalYieldReportResponseRowMapper);
         }catch (Exception ex){
             System.out.println("Error!!" +  ex.getMessage());

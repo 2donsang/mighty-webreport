@@ -18,6 +18,10 @@ public class DLODateDto {
 
     private List<IdTextDto> operations;
 
+    private Boolean checkBoxOne;
+
+    private String inputTextOne;
+
     public String getDevicesString(){
         if(devices.size()==0){
             return "";

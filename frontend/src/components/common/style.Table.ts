@@ -11,11 +11,11 @@ export const Container = styled.div<{headers:TableHeader[] , isViewAll:boolean ,
     border: 1px solid ${color.lightgray};
     height: ${(props) => {
         if(props.isViewAll){
-            return `650px`;
+            return `690px`;
         }else if(props.isLookDown){
             return `400px`;
         }else {
-            return `650px`;
+            return `690px`;
         }
     }};
     grid-template-columns: ${(props) => (props.headers.map((header)=> {

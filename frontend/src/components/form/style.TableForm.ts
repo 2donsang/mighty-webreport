@@ -10,6 +10,7 @@ export const Container = styled.div<{isViewAll:boolean}>`
     z-index: 10;
     width : 100%;
     overflow: auto;
+    height : 1000px;
   `}
   .btn-container{
     margin-left: auto;

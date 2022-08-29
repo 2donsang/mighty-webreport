@@ -155,7 +155,6 @@ const DailyWipTrend = () => {
             let currentMonth = getDateString(currentDate).substring(4, 6);
             let newLastDate = new Date(Number(startYear), Number(startMonth), 0);
             let endDate2 = currentMonth == startMonth ? getDateString(endDate) : getDateString(newLastDate);
-            console.log("가공된 endDate: "+endDate2)
             const params: object = {
                 dates: {
                     startDate: getDateString(startDate),
@@ -184,7 +183,6 @@ const DailyWipTrend = () => {
             dailyWipColumnNames.map((element: INaturalDate) => {
                 dailyLabels.push(element.naturalDate)
             })
-            console.log(dailyLabels);
 
             const res = await ApiUtil.post("/search/daily-wip-trend", params);
             //debugger
@@ -197,10 +195,10 @@ const DailyWipTrend = () => {
                     dispatch(showAlertModal("Information","Data"," does not exist."));
                 }
             }
+            console.log(res.data.dailyWipTrend);
             setSearchData(res.data.dailyWipTrend);
 
         }
-        console.log(document.getElementsByClassName('tableForm'))
         callAPI();
     }
 
@@ -495,7 +493,6 @@ const DailyWipTrend = () => {
                             selected={checkedDevices}
                             selector={setCheckedDevices}
                         />
-                        {/* 제품, LOT 번호, 공정, LOT Status */}
                         <SearchSelector
                             title={langState.isKor ? "LOT번호" : "LOT Numbers"}
                             list={lotNumbers}

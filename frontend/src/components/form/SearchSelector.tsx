@@ -220,6 +220,7 @@ const SearchSelector = ({ title , list , selected, selector, hasDesc = false} : 
                                 className={index===searchBoxFocusItem ? "focus-item" : undefined}
                             >
                             </li>
+                                
                         )
                     )}
                 </ul>)}

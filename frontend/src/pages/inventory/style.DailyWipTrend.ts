@@ -13,17 +13,20 @@ export const Container = styled.div<{isLookDown:boolean}>`
                 flex-directon : row;
             }
             .condition_container{               
-                display : grid;
-                grid-template-columns : repeat(1, 1fr);
-                grid-template-rows : repeat(3, 1fr);
-                div:nth-child(2){
-                    grid-column: 1/2;
-                    grid-row : 2/3;
-                }
-                div:nth-child(3){
-                    grid-column: 1/2;
-                    grid-row : 3;
-                }
+                // display : grid;
+                // grid-template-columns : repeat(1, 1fr);
+                // grid-template-rows : repeat(2, 1fr);
+                // div:nth-child(2){
+                //     grid-column: 1/2;
+                //     grid-row : 2/3;
+                // }
+                // div:nth-child(3){
+                //     grid-column: 1/2;
+                //     grid-row : 3;
+                // }
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
             }
             .tableForm{
                 height:auto;

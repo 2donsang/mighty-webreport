@@ -108,7 +108,6 @@ const AVIYield = () => {
                         dispatch(showAlertModal("Information", "Data", " does not exist."));
                     }
                 }
-                console.log(res.data.aviYieldReport);   
                 searchData.splice(0,searchData.length);
                 setSearchData(res.data.aviYieldReport);
         }
@@ -167,10 +166,8 @@ const AVIYield = () => {
    
                 //Turn Total
          //1. Turn 이 같은 애들끼리 분류하고 rowsCount 찾기
-         console.log(searchData);
          searchData.map((element,index)=>{
             if(index === 0){
-                console.log("0번째 인덱스"+index);
                 //@ts-ignore
                 lotNumber = element.lotNumber; //1.lotNumber 상관없이 처음의 turn 부터 수집하기위해
             }
@@ -261,7 +258,6 @@ const AVIYield = () => {
          //1. LotNumber 이 같은 애들끼리 분류하고 rowsCount 찾기
         searchData.map((element,index)=>{
             if(index === 0){
-                console.log("0번째 인덱스"+index);
                 //@ts-ignore
                 device = element.device; //1.device 상관없이 처음의 lotNumber 부터 수집하기위해
             }
@@ -340,7 +336,6 @@ const AVIYield = () => {
         //1. DEVICE 이 같은 애들끼리 분류하고 rowsCount 찾기
         searchData.map((element,index)=>{
             if(index === 0){
-                console.log("0번째 인덱스"+index);
                 //@ts-ignore
                 transTime = element.transTime; //1. TransTime 상관없이 처음 device부터 갯수를 분류하기위해 세팅
             }

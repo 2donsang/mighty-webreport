@@ -6,13 +6,14 @@ export const Container = styled.div<{isLookDown:boolean}>`
   height: 100%;
   position: relative;
   .test-degree-container{
-    border: 1px solid ${color.lightgray};
+    border: 3px solid ${color.lightgray};
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     margin-right: 10px;
+    font-size:13px;   
     .test-type{
       padding: 10px;
       label {
@@ -36,8 +37,8 @@ export const Container = styled.div<{isLookDown:boolean}>`
         margin-bottom: 10px;
       }
     }  
-    div:nth-child(3){
-      padding: 10px;
+    div:nth-child(2){
+      margin-bottom:15px;
     }
   }
   ${(props) => props.isLookDown

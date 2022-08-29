@@ -1,7 +1,7 @@
 import * as S from './style.TotalYield';
 import SearchSelector from "../../components/form/SearchSelector";
 import TableForm from "../../components/form/TableForm";
-import React, {startTransition, useEffect, useState} from "react";
+import React, {ChangeEvent, startTransition, useEffect, useState} from "react";
 import {CSVHeader, ISearchBox, TableHeader} from "../../types/type";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../modules";
@@ -15,7 +15,7 @@ const TotalYield = () => {
     const langState = useSelector((state:RootState) => state.langReducer);
 
     const tableHeaders:TableHeader[] = [   
-        {text: langState.isKor? "제품"         :"Device"     , width: "150px"},
+        {text: langState.isKor? "제품"         :"Device"     , width: "450px"},
         {text: langState.isKor? "로트"         :"LOT"     , width: "120px"},
         {text: langState.isKor? "차수"         :"Test Number"     , width: "100px"},
         {text: langState.isKor? "WaferNo"      :"WaferNo"     , width: "130px"},
@@ -71,6 +71,9 @@ const TotalYield = () => {
     const [tableBodies, setTableBodies] = useState<JSX.Element>((<tbody></tbody>));
     const [startDate,setStartDate] = useState(new Date("2000-01-01"));
     const [endDate,setEndDate] = useState(new Date());
+    const [existBothData, setExistBothData] = useState(false);
+    const [baseYield, setBaseYield] = useState("");
+    const [originTotalRowCnt, setOriginTotalRowCnt] = useState<number>(0);
 
     const dispatch = useDispatch();
 
@@ -84,9 +87,14 @@ const TotalYield = () => {
                     },
                     devices : checkedDevices,
                     lotNumbers : checkedLotNumbers,
+                    checkBoxOne : existBothData,
+                    inputTextOne : baseYield,
+                    
+                    
                 }
 
                 const res = await ApiUtil.post("/search/total-yield-report",params);
+                setOriginTotalRowCnt(res.data.totalYieldReport.length);
                 if(res.data.totalYieldReport.length ==0){
                     if(langState.isKor)
                     {
@@ -95,7 +103,6 @@ const TotalYield = () => {
                         dispatch(showAlertModal("Information","Data"," does not exist."));
                     }
                 }
-                console.log("검색버튼 누르고 : "+res.data.totalYieldReport);   
                 searchData.splice(0,searchData.length);
                 setSearchData(res.data.totalYieldReport);
         }
@@ -133,10 +140,75 @@ const TotalYield = () => {
         let device:string = "";
         let lotNumber:string ="";
         let turn:string ="";
-        let counter:number = 0;       
+        let counter:number = 0;
+        const totalCol:TotalCol[] = [];
         const deviceCol:TotalCol[] = [];
         const lotNumberCol:TotalCol[] = [];
         const turnCol:TotalCol[] = [];
+
+
+        let totalProbe:number = 0;
+        let passProbe:number =0;
+        let failProbe:number = 0;
+        let totalAvi:number = 0;
+        let passAvi:number = 0;
+
+        //Total
+        searchData.map((element,index)=>{
+            if(element.totalProbe != undefined && typeof element.totalProbe ==='number'){
+                totalProbe += element.totalProbe;
+            }
+            if(element.passProbe != undefined && typeof element.passProbe ==='number'){
+                passProbe += element.passProbe;
+            }
+            if(element.failProbe != undefined && typeof element.failProbe ==='number'){
+                failProbe += element.failProbe;
+            }
+            if(element.totalAvi != undefined && typeof element.totalAvi ==='number'){
+                totalAvi += element.totalAvi;
+            }
+            if(element.passAvi != undefined && typeof element.passAvi ==='number'){
+                passAvi += element.passAvi;
+            }
+          
+            if(index == 0){
+                totalCol.push({
+                    //@ts-ignore
+                    rowCount : element.yieldAvi !=undefined? 1 : 0, //yieldAvi total 계산을 위한 카운트
+                    //@ts-ignore
+                    YieldAvi : element.yieldAvi !=undefined? element.yieldAvi : 0,
+
+                    //@ts-ignore
+                    rowCountTwo : element.cumYield !=undefined && element.cumYield !=0? 1 : 0, // yieldCum total 계산을 위한 카운트
+                    //@ts-ignore
+                    YieldCum : element.cumYield !=undefined? element.cumYield : 0,
+
+                    //@ts-ignore
+                    rowCountThree : element.yieldProbe != undefined && element.yieldProbe !=0? 1 : 0, //yieldProbe total 계산을 위한 카운트
+                    //@ts-ignore
+                    YieldProbe : element.yieldProbe !=undefined? element.yieldProbe : 0,
+
+                    //@ts-ignore
+                    deviceName : element.device,
+                })
+            }else{
+                totalCol[totalCol.length-1].rowCount += element.yieldAvi !=undefined? 1 : 0;
+                //@ts-ignore
+                totalCol[totalCol.length-1].YieldAvi += element.yieldAvi !=undefined? element.yieldAvi : 0;
+                //@ts-ignore
+                totalCol[totalCol.length-1].rowCountTwo += element.cumYield !=undefined && element.cumYield !=0? 1 : 0;
+                //@ts-ignore
+                totalCol[totalCol.length-1].YieldCum += element.cumYield !=undefined? element.cumYield : 0;
+                //@ts-ignore
+                totalCol[totalCol.length-1].rowCountThree += element.yieldProbe !=undefined && element.yieldProbe !=0? 1 : 0;
+                //@ts-ignore
+                totalCol[totalCol.length-1].YieldProbe += element.yieldProbe != undefined? element.yieldProbe:0;
+                
+                //@ts-ignore
+                totalCol[totalCol.length-1].deviceName  = element.device;
+                
+            }
+        })
 
            //turn
            searchData.map((element,index)=>{
@@ -205,10 +277,14 @@ const TotalYield = () => {
                 })
             }
         })
-        console.log(searchData);
+        
+        //turn total 삽입
         for(let i =0; i<turnCol.length;i++){
             let tempProbeYield:number = turnCol[i].GoodDieProbe/turnCol[i].TestDieProbe;
             let tempAviYield:number = turnCol[i].GoodDieAvi/turnCol[i].TestDieAvi;
+            
+            //i==0? counter += turnCol[i].rowCount : counter += turnCol[i].rowCount+1 ;
+            
             searchData.splice(counter,0,{
                 device : turnCol[i].deviceName,
                 lotNumber : turnCol[i].lotNumber,
@@ -221,234 +297,221 @@ const TotalYield = () => {
                 failProbe : (turnCol[i].FailDieProbe).toString(),
                 totalAvi : (turnCol[i].TestDieAvi).toString(),
                 passAvi : (turnCol[i].GoodDieAvi).toString(),
+
+                //Probe와 AVI 2개중 하나라도 0인경우
                 yieldProbe : turnCol[i].GoodDieProbe !=undefined && turnCol[i].GoodDieProbe >0? +(tempProbeYield * 100).toFixed(2) : 0,
                 yieldAvi : turnCol[i].GoodDieAvi !=undefined && turnCol[i].GoodDieAvi >0? +(tempAviYield * 100).toFixed(2): 0,
-
                 cumYield : (turnCol[i].GoodDieProbe !=undefined && turnCol[i].GoodDieProbe >0) &&
                             (turnCol[i].GoodDieAvi !=undefined && turnCol[i].GoodDieAvi >0) ? +((tempProbeYield * tempAviYield)*100).toFixed(2) //cumYield 계산식 : (Probe일드*AVI일드)*100 ??
                             : (turnCol[i].GoodDieProbe ==undefined || turnCol[i].GoodDieProbe ===0)? +(tempAviYield*100).toFixed(2) : +(tempProbeYield*100).toFixed(2),
             })
-            counter += turnCol[i].rowCount +1;
+            counter += turnCol[i].rowCount +1;           
         }
-
-        counter = 0;
+ 
         device = "";
         lotNumber = "";
 
-           //lotNumber
-           searchData.map((element,index)=>{
-            if(index === 0){
-                console.log("0번째 인덱스"+index);
+        //lotNumber
+        searchData.map((element, index) => {
+            if (index === 0) {
+                console.log("0번째 인덱스" + index);
                 //@ts-ignore
                 device = element.device;
             }
-            
-            if(element.device == device){  
-                if(element.lotNumber != lotNumber &&
-                    element.lotNumber != null &&
-                    element.lotNumber != undefined){
-                        lotNumber = element.lotNumber;
-                        lotNumberCol.push({
-                            rowCount: 1,
-                            //@ts-ignore
-                            deviceName : element.device,
-                            waferId : element.waferId,
-                            lotNumber : element.lotNumber,
-                            TestDieProbe : element.totalProbe != undefined && typeof element.totalProbe === "number"? element.totalProbe : 0,
-                            GoodDieProbe : element.passProbe != undefined && typeof element.passProbe === "number"? element.passProbe : 0,
-                            FailDieProbe : element.failProbe != undefined && typeof element.failProbe === "number"? element.failProbe : 0,
-                            YieldProbe : element.yieldProbe != undefined && typeof element.yieldProbe === "number"? element.yieldProbe : 0,
-                            TestDieAvi : element.totalAvi != undefined && typeof element.totalAvi === "number"? element.totalAvi : 0,
-                            GoodDieAvi : element.passAvi != undefined && typeof element.passAvi === "number"? element.passAvi : 0,
-                            YieldAvi : element.yieldAvi != undefined && typeof element.yieldAvi === "number"? element.yieldAvi : 0,
-                            YieldCum : element.cumYield != undefined && typeof element.cumYield === "number"? element.cumYield : 0,
-                        })
-                    }else {
-                        lotNumberCol[lotNumberCol.length-1].rowCount++;
-                        lotNumberCol[lotNumberCol.length-1].TestDieProbe   += element.totalProbe != undefined && typeof element.totalProbe === "number"? element.totalProbe : 0;
-                        lotNumberCol[lotNumberCol.length-1].GoodDieProbe += element.passProbe != undefined && typeof element.passProbe === "number"? element.passProbe : 0;
-                        lotNumberCol[lotNumberCol.length-1].FailDieProbe += element.failProbe != undefined && typeof element.failProbe === "number"? element.failProbe : 0;
-                        lotNumberCol[lotNumberCol.length-1].YieldProbe += element.yieldProbe != undefined && typeof element.yieldProbe === "number"? element.yieldProbe : 0;
-                        lotNumberCol[lotNumberCol.length-1].TestDieAvi += element.totalAvi != undefined && typeof element.totalAvi === "number"? element.totalAvi : 0;
-                        lotNumberCol[lotNumberCol.length-1].GoodDieAvi += element.passAvi != undefined && typeof element.passAvi === "number"? element.passAvi : 0;
-                        lotNumberCol[lotNumberCol.length-1].YieldAvi += element.yieldAvi != undefined && typeof element.yieldAvi === "number"? element.yieldAvi : 0;
-                        lotNumberCol[lotNumberCol.length-1].YieldCum += element.cumYield != undefined && typeof element.cumYield === "number"? element.cumYield : 0;
-                        
-                    }
 
-            }else{ 
+            if (element.device == device) {
+                if (element.lotNumber != lotNumber &&
+                    element.lotNumber != null &&
+                    element.lotNumber != undefined) {
+                    lotNumber = element.lotNumber;
+                    lotNumberCol.push({
+                        rowCount: 1,
+                        //@ts-ignore
+                        deviceName: element.device,
+                        lotNumber: element.lotNumber,
+                        waferId: element.waferId,
+                        TestDieProbe: element.totalProbe != undefined && typeof element.totalProbe === "number" ? element.totalProbe : 0,
+                        GoodDieProbe: element.passProbe != undefined && typeof element.passProbe === "number" ? element.passProbe : 0,
+                        FailDieProbe: element.failProbe != undefined && typeof element.failProbe === "number" ? element.failProbe : 0,
+                        YieldProbe: element.yieldProbe != undefined && typeof element.yieldProbe === "number" ? element.yieldProbe : 0,
+                        TestDieAvi: element.totalAvi != undefined && typeof element.totalAvi === "number" ? element.totalAvi : 0,
+                        GoodDieAvi: element.passAvi != undefined && typeof element.passAvi === "number" ? element.passAvi : 0,
+                        YieldAvi: element.yieldAvi != undefined && typeof element.yieldAvi === "number" ? element.yieldAvi : 0,
+                        YieldCum: element.cumYield != undefined && typeof element.cumYield === "number" ? element.cumYield : 0,
+                    })
+                } else {
+                    lotNumberCol[lotNumberCol.length - 1].rowCount++;
+                    lotNumberCol[lotNumberCol.length - 1].TestDieProbe += element.totalProbe != undefined && typeof element.totalProbe === "number" ? element.totalProbe : 0;
+                    lotNumberCol[lotNumberCol.length - 1].GoodDieProbe += element.passProbe != undefined && typeof element.passProbe === "number" ? element.passProbe : 0;
+                    lotNumberCol[lotNumberCol.length - 1].FailDieProbe += element.failProbe != undefined && typeof element.failProbe === "number" ? element.failProbe : 0;
+                    lotNumberCol[lotNumberCol.length - 1].YieldProbe += element.yieldProbe != undefined && typeof element.yieldProbe === "number" ? element.yieldProbe : 0;
+                    lotNumberCol[lotNumberCol.length - 1].TestDieAvi += element.totalAvi != undefined && typeof element.totalAvi === "number" ? element.totalAvi : 0;
+                    lotNumberCol[lotNumberCol.length - 1].GoodDieAvi += element.passAvi != undefined && typeof element.passAvi === "number" ? element.passAvi : 0;
+                    lotNumberCol[lotNumberCol.length - 1].YieldAvi += element.yieldAvi != undefined && typeof element.yieldAvi === "number" ? element.yieldAvi : 0;
+                    lotNumberCol[lotNumberCol.length - 1].YieldCum += element.cumYield != undefined && typeof element.cumYield === "number" ? element.cumYield : 0;
+
+                }
+
+            } else {
+                //@ts-ignore
+                device = element.device;
                 //@ts-ignore
                 lotNumber = element.lotNumber;
 
                 lotNumberCol.push({
                     rowCount: 1,
                     //@ts-ignore
-                    deviceName : element.device,
-                     //@ts-ignore
-                     waferId : element.waferId,
-                     //@ts-ignore
-                    lotNumber : element.lotNumber,
-                    TestDieProbe : element.totalProbe != undefined && typeof element.totalProbe === "number"? element.totalProbe : 0,
-                    GoodDieProbe : element.passProbe != undefined && typeof element.passProbe === "number"? element.passProbe : 0,
-                    FailDieProbe : element.failProbe != undefined && typeof element.failProbe === "number"? element.failProbe : 0,
-                    YieldProbe : element.yieldProbe != undefined && typeof element.yieldProbe === "number"? element.yieldProbe : 0,
-                    TestDieAvi : element.totalAvi != undefined && typeof element.totalAvi === "number"? element.totalAvi : 0,
-                    GoodDieAvi : element.passAvi != undefined && typeof element.passAvi === "number"? element.passAvi : 0,
-                    YieldAvi : element.yieldAvi != undefined && typeof element.yieldAvi === "number"? element.yieldAvi : 0,
-                    YieldCum : element.cumYield != undefined && typeof element.cumYield === "number"? element.cumYield : 0,
+                    deviceName: element.device,
+                    //@ts-ignore
+                    waferId: element.waferId,
+                    //@ts-ignore
+                    lotNumber: element.lotNumber,
+                    TestDieProbe: element.totalProbe != undefined && typeof element.totalProbe === "number" ? element.totalProbe : 0,
+                    GoodDieProbe: element.passProbe != undefined && typeof element.passProbe === "number" ? element.passProbe : 0,
+                    FailDieProbe: element.failProbe != undefined && typeof element.failProbe === "number" ? element.failProbe : 0,
+                    YieldProbe: element.yieldProbe != undefined && typeof element.yieldProbe === "number" ? element.yieldProbe : 0,
+                    TestDieAvi: element.totalAvi != undefined && typeof element.totalAvi === "number" ? element.totalAvi : 0,
+                    GoodDieAvi: element.passAvi != undefined && typeof element.passAvi === "number" ? element.passAvi : 0,
+                    YieldAvi: element.yieldAvi != undefined && typeof element.yieldAvi === "number" ? element.yieldAvi : 0,
+                    YieldCum: element.cumYield != undefined && typeof element.cumYield === "number" ? element.cumYield : 0,
                 })
             }
         })
-        console.log(searchData);
-        for(let i =0; i<lotNumberCol.length;i++){
-            let tempProbeYield:number = lotNumberCol[i].GoodDieProbe/lotNumberCol[i].TestDieProbe;
-            let tempAviYield:number = lotNumberCol[i].GoodDieAvi/lotNumberCol[i].TestDieAvi;
-            searchData.splice(counter,0,{
-                device : lotNumberCol[i].deviceName,
-                lotNumber : lotNumberCol[i].lotNumber + "*",
-                turn : lotNumberCol[i].turn,
-                colSpanFour : lotNumberCol[i].rowCount,
-                isLotNumber : true,
-                cellColor : '#B4FBFF',
-                totalProbe : (lotNumberCol[i].TestDieProbe).toString(),
-                passProbe : (lotNumberCol[i].GoodDieProbe).toString(),
-                failProbe : (lotNumberCol[i].FailDieProbe).toString(),
-                totalAvi : (lotNumberCol[i].TestDieAvi).toString(),
-                passAvi : (lotNumberCol[i].GoodDieAvi).toString(),
-                yieldProbe : lotNumberCol[i].GoodDieProbe !=undefined && lotNumberCol[i].GoodDieProbe >0? +(tempProbeYield * 100).toFixed(2) : 0,
-                yieldAvi : lotNumberCol[i].GoodDieAvi !=undefined && lotNumberCol[i].GoodDieAvi >0? +(tempAviYield * 100).toFixed(2): 0,
 
-                cumYield : (lotNumberCol[i].GoodDieProbe !=undefined && lotNumberCol[i].GoodDieProbe >0) &&
-                            (lotNumberCol[i].GoodDieAvi !=undefined && lotNumberCol[i].GoodDieAvi >0) ? +((tempProbeYield * tempAviYield)*100).toFixed(2) 
-                            : (lotNumberCol[i].GoodDieProbe ==undefined || lotNumberCol[i].GoodDieProbe ===0)? +(tempAviYield*100).toFixed(2) : +(tempProbeYield*100).toFixed(2),
+        //lotnumber total 삽입
+        counter = 0;
+        for (let i = 0; i < lotNumberCol.length; i++) {
+            let tempProbeYield: number = lotNumberCol[i].GoodDieProbe / lotNumberCol[i].TestDieProbe;
+            let tempAviYield: number = lotNumberCol[i].GoodDieAvi / lotNumberCol[i].TestDieAvi;
+            searchData.splice(counter, 0, {
+                device: lotNumberCol[i].deviceName,
+                lotNumber: lotNumberCol[i].lotNumber + "*",
+                turn: lotNumberCol[i].turn,
+                colSpanFour: lotNumberCol[i].rowCount,
+                isLotNumber: true,
+                cellColor: '#B4FBFF',
+                totalProbe: (lotNumberCol[i].TestDieProbe).toString(),
+                passProbe: (lotNumberCol[i].GoodDieProbe).toString(),
+                failProbe: (lotNumberCol[i].FailDieProbe).toString(),
+                totalAvi: (lotNumberCol[i].TestDieAvi).toString(),
+                passAvi: (lotNumberCol[i].GoodDieAvi).toString(),
+
+                yieldProbe: lotNumberCol[i].GoodDieProbe != undefined && lotNumberCol[i].GoodDieProbe > 0 ? +(tempProbeYield * 100).toFixed(2) : 0,
+                yieldAvi: lotNumberCol[i].GoodDieAvi != undefined && lotNumberCol[i].GoodDieAvi > 0 ? +(tempAviYield * 100).toFixed(2) : 0,
+                cumYield: (lotNumberCol[i].GoodDieProbe != undefined && lotNumberCol[i].GoodDieProbe > 0) &&
+                    (lotNumberCol[i].GoodDieAvi != undefined && lotNumberCol[i].GoodDieAvi > 0) ? +((tempProbeYield * tempAviYield) * 100).toFixed(2)
+                    : (lotNumberCol[i].GoodDieProbe == undefined || lotNumberCol[i].GoodDieProbe === 0) ? +(tempAviYield * 100).toFixed(2) : +(tempProbeYield * 100).toFixed(2),
+
             })
-            counter += lotNumberCol[i].rowCount +1;
+            counter += lotNumberCol[i].rowCount + 1;
         }
 
-        counter = 0;
         device = "";
         lotNumber = "";
-        let totalProbe:number = 0;
-        let passProbe:number =0;
-        let failProbe:number = 0;
-        let totalAvi:number = 0;
-        let passAvi:number = 0;
-        let yieldProbe:number = 0;
-        let yieldAvi:number = 0;
-        let cumYield:number = 0;
-        let yieldProbeCnt:number = 0;
-        let yieldAviCnt:number = 0;
-        let yieldCumCnt:number = 0;
 
+        //Device
+        searchData.map((element) => {
 
-             //Device
-             searchData.map((element)=>{
-    
-                if(element.device != device &&
-                    element.device !=null && 
-                    element.device != undefined){
-                    device = element.device;
-                    deviceCol.push({
-                        rowCount: 1,
-                        //@ts-ignore
-                        deviceName : element.device,
-                        waferId : element.waferId,
-                        TestDieProbe : element.totalProbe != undefined && typeof element.totalProbe === "number"? element.totalProbe : 0,
-                        GoodDieProbe : element.passProbe != undefined && typeof element.passProbe === "number"? element.passProbe : 0,
-                        FailDieProbe : element.failProbe != undefined && typeof element.failProbe === "number"? element.failProbe : 0,
-                        YieldProbe : element.yieldProbe != undefined && typeof element.yieldProbe === "number"? element.yieldProbe : 0,
-                        TestDieAvi : element.totalAvi != undefined && typeof element.totalAvi === "number"? element.totalAvi : 0,
-                        GoodDieAvi : element.passAvi != undefined && typeof element.passAvi === "number"? element.passAvi : 0,
-                        YieldAvi : element.yieldAvi != undefined && typeof element.yieldAvi === "number"? element.yieldAvi : 0,
-                        YieldCum : element.cumYield != undefined && typeof element.cumYield === "number"? element.cumYield : 0,
-                    })
-                }else{
-                    deviceCol[deviceCol.length-1].rowCount++;
-                    deviceCol[deviceCol.length-1].TestDieProbe   += element.totalProbe != undefined && typeof element.totalProbe === "number"? element.totalProbe : 0;
-                    deviceCol[deviceCol.length-1].GoodDieProbe += element.passProbe != undefined && typeof element.passProbe === "number"? element.passProbe : 0;
-                    deviceCol[deviceCol.length-1].FailDieProbe += element.failProbe != undefined && typeof element.failProbe === "number"? element.failProbe : 0;
-                    deviceCol[deviceCol.length-1].YieldProbe += element.yieldProbe != undefined && typeof element.yieldProbe === "number"? element.yieldProbe : 0;
-                    deviceCol[deviceCol.length-1].TestDieAvi += element.totalAvi != undefined && typeof element.totalAvi === "number"? element.totalAvi : 0;
-                    deviceCol[deviceCol.length-1].GoodDieAvi += element.passAvi != undefined && typeof element.passAvi === "number"? element.passAvi : 0;
-                    deviceCol[deviceCol.length-1].YieldAvi += element.yieldAvi != undefined && typeof element.yieldAvi === "number"? element.yieldAvi : 0;
-                    deviceCol[deviceCol.length-1].YieldCum += element.cumYield != undefined && typeof element.cumYield === "number"? element.cumYield : 0;
-                }
-            })
-    
-            //2.  분류한 Row 삽입
-            for(let i = 0; i<deviceCol.length; i++){
-                let tempProbeYield:number = deviceCol[i].GoodDieProbe/deviceCol[i].TestDieProbe;
-                let tempAviYield:number = deviceCol[i].GoodDieAvi/deviceCol[i].TestDieAvi;
-                searchData.splice(counter,0,{
-                    device : deviceCol[i].deviceName + "*",
-                    colSpan : deviceCol[i].rowCount,
-                    isDevice : true,
-                    cellColor : '#BECDFF',
-                    totalProbe : (deviceCol[i].TestDieProbe).toString(),
-                    passProbe : (deviceCol[i].GoodDieProbe).toString(),
-                    failProbe : (deviceCol[i].FailDieProbe).toString(),                   
-                    totalAvi : (deviceCol[i].TestDieAvi).toString(),
-                    passAvi : (deviceCol[i].GoodDieAvi).toString(),
-                    yieldProbe : deviceCol[i].GoodDieProbe !=undefined && deviceCol[i].GoodDieProbe >0? +(tempProbeYield * 100).toFixed(2) : 0,
-                    yieldAvi : deviceCol[i].GoodDieAvi !=undefined && deviceCol[i].GoodDieAvi >0? +(tempAviYield * 100).toFixed(2): 0,
-
-                    cumYield : (deviceCol[i].GoodDieProbe !=undefined && deviceCol[i].GoodDieProbe >0) &&
-                                (deviceCol[i].GoodDieAvi !=undefined && deviceCol[i].GoodDieAvi >0) ? +((tempProbeYield * tempAviYield)*100).toFixed(2) 
-                                : (deviceCol[i].GoodDieProbe ==undefined || deviceCol[i].GoodDieProbe ===0)? +(tempAviYield*100).toFixed(2) : +(tempProbeYield*100).toFixed(2),
+            if (element.device != device &&
+                element.device != null &&
+                element.device != undefined) {
+                device = element.device;
+                deviceCol.push({
+                    rowCount: 1,
+                    //@ts-ignore
+                    deviceName: element.device,
+                    waferId: element.waferId,
+                    TestDieProbe: element.totalProbe != undefined && typeof element.totalProbe === "number" ? element.totalProbe : 0,
+                    GoodDieProbe: element.passProbe != undefined && typeof element.passProbe === "number" ? element.passProbe : 0,
+                    FailDieProbe: element.failProbe != undefined && typeof element.failProbe === "number" ? element.failProbe : 0,
+                    YieldProbe: element.yieldProbe != undefined && typeof element.yieldProbe === "number" ? element.yieldProbe : 0,
+                    TestDieAvi: element.totalAvi != undefined && typeof element.totalAvi === "number" ? element.totalAvi : 0,
+                    GoodDieAvi: element.passAvi != undefined && typeof element.passAvi === "number" ? element.passAvi : 0,
+                    YieldAvi: element.yieldAvi != undefined && typeof element.yieldAvi === "number" ? element.yieldAvi : 0,
+                    YieldCum: element.cumYield != undefined && typeof element.cumYield === "number" ? element.cumYield : 0,
                 })
-               
-                counter += deviceCol[i].rowCount +1;
-
+            } else {
+                deviceCol[deviceCol.length - 1].rowCount++;
+                deviceCol[deviceCol.length - 1].TestDieProbe += element.totalProbe != undefined && typeof element.totalProbe === "number" ? element.totalProbe : 0;
+                deviceCol[deviceCol.length - 1].GoodDieProbe += element.passProbe != undefined && typeof element.passProbe === "number" ? element.passProbe : 0;
+                deviceCol[deviceCol.length - 1].FailDieProbe += element.failProbe != undefined && typeof element.failProbe === "number" ? element.failProbe : 0;
+                deviceCol[deviceCol.length - 1].YieldProbe += element.yieldProbe != undefined && typeof element.yieldProbe === "number" ? element.yieldProbe : 0;
+                deviceCol[deviceCol.length - 1].TestDieAvi += element.totalAvi != undefined && typeof element.totalAvi === "number" ? element.totalAvi : 0;
+                deviceCol[deviceCol.length - 1].GoodDieAvi += element.passAvi != undefined && typeof element.passAvi === "number" ? element.passAvi : 0;
+                deviceCol[deviceCol.length - 1].YieldAvi += element.yieldAvi != undefined && typeof element.yieldAvi === "number" ? element.yieldAvi : 0;
+                deviceCol[deviceCol.length - 1].YieldCum += element.cumYield != undefined && typeof element.cumYield === "number" ? element.cumYield : 0;
             }
+        })
 
-            //Total
-            searchData.map((element,index)=>{
-                if(element.totalProbe != undefined && typeof element.totalProbe ==='number'){
-                    totalProbe += element.totalProbe;
-                }
-                if(element.passProbe != undefined && typeof element.passProbe ==='number'){
-                    passProbe += element.passProbe;
-                }
-                if(element.failProbe != undefined && typeof element.failProbe ==='number'){
-                    failProbe += element.failProbe;
-                }
-                if(element.totalAvi != undefined && typeof element.totalAvi ==='number'){
-                    totalAvi += element.totalAvi;
-                }
-                if(element.passAvi != undefined && typeof element.passAvi ==='number'){
-                    passAvi += element.passAvi;
-                }
-              
+        //device total 삽입
+        counter = 0;
+        for (let i = 0; i < deviceCol.length; i++) {
+            let tempProbeYield: number = deviceCol[i].GoodDieProbe / deviceCol[i].TestDieProbe;
+            let tempAviYield: number = deviceCol[i].GoodDieAvi / deviceCol[i].TestDieAvi;
+            searchData.splice(counter, 0, {
+                device: deviceCol[i].deviceName + "*",
+                colSpan: deviceCol[i].rowCount,
+                isDevice: true,
+                cellColor: '#BECDFF',
+                totalProbe: (deviceCol[i].TestDieProbe).toString(),
+                passProbe: (deviceCol[i].GoodDieProbe).toString(),
+                failProbe: (deviceCol[i].FailDieProbe).toString(),
+                totalAvi: (deviceCol[i].TestDieAvi).toString(),
+                passAvi: (deviceCol[i].GoodDieAvi).toString(),
+                yieldProbe: deviceCol[i].GoodDieProbe != undefined && deviceCol[i].GoodDieProbe > 0 ? +(tempProbeYield * 100).toFixed(2) : 0,
+                yieldAvi: deviceCol[i].GoodDieAvi != undefined && deviceCol[i].GoodDieAvi > 0 ? +(tempAviYield * 100).toFixed(2) : 0,
+                cumYield: (deviceCol[i].GoodDieProbe != undefined && deviceCol[i].GoodDieProbe > 0) &&
+                    (deviceCol[i].GoodDieAvi != undefined && deviceCol[i].GoodDieAvi > 0) ? +((tempProbeYield * tempAviYield) * 100).toFixed(2)
+                    : (deviceCol[i].GoodDieProbe == undefined || deviceCol[i].GoodDieProbe === 0) ? +(tempAviYield * 100).toFixed(2) : +(tempProbeYield * 100).toFixed(2),
 
-                if(index == searchData.length-1){
-                    searchData.splice(0,0,{
-                        device : "Total",
-                        totalProbe : totalProbe.toString(),
-                        passProbe : passProbe.toString(),
-                        failProbe : failProbe.toString(),
-                        yieldProbe : passProbe !=undefined && passProbe >0? +((passProbe/totalProbe)*100).toFixed(2) : 0,
-                        totalAvi : totalAvi.toString(),
-                        passAvi : passAvi.toString(),
-                        yieldAvi : passAvi !=undefined && passAvi > 0 ?  +((passAvi/totalAvi)*100).toFixed(2): 0,
-                        
-                        cumYield : (passProbe !=undefined && passProbe >0) &&
-                                    (passAvi !=undefined && passAvi >0) ? +(((passProbe/totalProbe)*(passAvi/totalAvi))*100).toFixed(2) //cumYield 공식 : ProbeYield * AviYield * 100
-                                    : (passProbe ==undefined || passProbe ===0)? +(passAvi/totalAvi*100).toFixed(2) : +(passProbe/totalProbe*100).toFixed(2),
-
-                        isTotal : true,
-                        cellColor : '#BDFFC7',
-                    })
-                }
             })
+
+            counter += deviceCol[i].rowCount + 1;
+        }
+
+        //total 삽입
+        counter = 0;
+        for (let i = 0; i < totalCol.length; i++) {
+            searchData.splice(counter, 0, {
+                device: "Total",
+                totalProbe: totalProbe.toString(),
+                passProbe: passProbe.toString(),
+                failProbe: failProbe.toString(),
+                totalAvi: totalAvi.toString(),
+                passAvi: passAvi.toString(),
+
+                //// 수량으로 total  yield 구하기              
+                //yieldProbe: passProbe != undefined && passProbe > 0 ? +((passProbe / totalProbe) * 100).toFixed(2) : 0,
+                // yieldAvi : passAvi !=undefined && passAvi > 0 ?  +((passAvi/totalAvi)*100).toFixed(2): 0, 
+
+                ////cumYield 공식(ProbeYield * AviYield * 100)으로 구하기
+                // cumYield : (passProbe !=undefined && passProbe >0) &&
+                //             (passAvi !=undefined && passAvi >0) ? +(((passProbe/totalProbe)*(passAvi/totalAvi))*100).toFixed(2) 
+                //             : (passProbe ==undefined || passProbe ===0)? +(passAvi/totalAvi*100).toFixed(2) : +(passProbe/totalProbe*100).toFixed(2),
+
+                // yield의 합을 갯수로 나눠서 구하기
+                //@ts-ignore 
+                yieldProbe : +(+(totalCol[totalCol.length-1].YieldProbe.toFixed(2)) / totalCol[totalCol.length-1].rowCountThree).toFixed(2),
+
+                //@ts-ignore 
+                yieldAvi: +(+(totalCol[totalCol.length - 1].YieldAvi.toFixed(2)) / totalCol[totalCol.length - 1].rowCount).toFixed(2),
+                //@ts-ignore 
+                cumYield: +(totalCol[totalCol.length - 1].YieldCum / totalCol[totalCol.length - 1].rowCountTwo).toFixed(2),
+
+                isTotal: true,
+                cellColor: '#BDFFC7',
+            })
+        }
+
     
-            //1000자리 구분자 넣기
-            searchData.map((element) =>{
-                element.totalProbe = element.totalProbe !=undefined? addCommaToString(+element.totalProbe):undefined;
-                element.passProbe = element.passProbe !=undefined? addCommaToString(+element.passProbe):undefined;
-                element.failProbe = element.failProbe !=undefined? addCommaToString(+element.failProbe):undefined;
-                element.totalAvi = element.totalAvi !=undefined? addCommaToString(+element.totalAvi):undefined;
-                element.passAvi = element.passAvi !=undefined? addCommaToString(+element.passAvi):undefined;
-            })
+        //1000자리 구분자 넣기
+        searchData.map((element) => {
+            element.totalProbe = element.totalProbe != undefined ? addCommaToString(+element.totalProbe) : undefined;
+            element.passProbe = element.passProbe != undefined ? addCommaToString(+element.passProbe) : undefined;
+            element.failProbe = element.failProbe != undefined ? addCommaToString(+element.failProbe) : undefined;
+            element.totalAvi = element.totalAvi != undefined ? addCommaToString(+element.totalAvi) : undefined;
+            element.passAvi = element.passAvi != undefined ? addCommaToString(+element.passAvi) : undefined;
+        })
         
         
         startTransition(()=>{
@@ -510,6 +573,27 @@ const TotalYield = () => {
                             {element.cellColor == undefined? <td><span>{element.yieldAvi}</span></td> : <td style={{backgroundColor:element.cellColor, fontWeight: 'bold'}}><span>{element.yieldAvi}</span></td>}
                             {element.cellColor == undefined? <td><span>{element.shipmentDate}</span></td> : <td style={{backgroundColor:element.cellColor, fontWeight: 'bold'}}><span>{element.shipmentDate}</span></td>}
                             {element.cellColor == undefined? <td><span>{element.cumYield}</span></td> : <td style={{backgroundColor:element.cellColor, fontWeight: 'bold'}}><span>{element.cumYield}</span></td>}
+
+                            {/* <td><span>{element.device}</span></td>
+                            <td><span>{element.lotNumber}</span></td>
+                            <td><span>{element.turn}</span></td>
+                            <td><span>{element.waferId}</span></td>
+                            <td><span>{element.totalProbe}</span></td>
+                            <td><span>{element.passProbe}</span></td>
+                            <td><span>{element.failProbe}</span></td>
+                            <td><span>{element.yieldProbe}</span></td>
+                            <td><span>{element.b2}</span></td>
+                            <td><span>{element.b3}</span></td>
+                            <td><span>{element.b4}</span></td>
+                            <td><span>{element.b5}</span></td>
+                            <td><span>{element.b6}</span></td>
+                            <td><span>{element.b7}</span></td>
+                            <td><span>{element.b8}</span></td>
+                            <td><span>{element.totalAvi}</span></td>
+                            <td><span>{element.passAvi}</span></td>
+                            <td><span>{element.yieldAvi}</span></td>
+                            <td><span>{element.shipmentDate}</span></td>
+                            <td><span>{element.cumYield}</span></td> */}
                         </tr>
                     </React.Fragment>
                 ))}
@@ -523,34 +607,36 @@ const TotalYield = () => {
         return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
+    const existBothDataChanged = ((e:ChangeEvent<HTMLInputElement>)=>{
+            setExistBothData(e.target.checked);
+            
+    })
+    const baseYieldChanged =((e:ChangeEvent<HTMLInputElement>) =>{
+        setBaseYield((e.target.value).replace(/[^0-9]/g, ''));
+    })
+
     return (
         <S.Container
             isLookDown={isLookDown}
         >
             <form onSubmit={onSubmit}>
                 <div className='condition-container'>
-                    {/* <div className="test-degree-container">
-                        <div className="test-type">
-                            <label>TEST 유형</label>
-                            <select>
-                                <option>ALL</option>
-                            </select>
-                        </div>
+                    <div className="test-degree-container">
                         <div className="degree">
                             <div>
-                                <label>차수</label>
-                                <input type="text" placeholder="3차"/>
+                                <label>{langState.isKor? 'Cum Yield 기준' :'Base Cum Yield'} </label>
+                                <input type="text" value={baseYield} onChange={baseYieldChanged}/>
                             </div>
-                            <div>
+                            {/* <div>
                                 <input className="check-box" type="checkbox" />
                                 <label>최종차수</label>
-                            </div>
+                            </div> */}
                         </div>
                         <div>
-                            <input className="check-box" type="checkbox" />
-                            <label>불량율 보기</label>
+                            <input className="check-box" type="checkbox"  onChange={existBothDataChanged} />
+                            <label>{langState.isKor? "PTEST AVI Data 둘다 있는것만 보기":"Both PTEST and AVI exist"}</label>
                         </div>
-                    </div> */}
+                    </div>
                     <SearchSelector
                         title={langState.isKor ? "제품" : "Device"}
                         list={devices}
@@ -574,7 +660,7 @@ const TotalYield = () => {
                     isLookDown={isLookDown}
                     setIsLookDown={setIsLookDown}
                     isDateRange={true}
-                    isDatePicker={true}
+                    isDatePicker={false}
                     startDate={startDate}
                     endDate={endDate}
                     setStartDate={setStartDate}

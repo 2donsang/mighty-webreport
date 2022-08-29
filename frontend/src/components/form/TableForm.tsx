@@ -15,6 +15,8 @@ import {
     useContextMenu
 } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../modules';
 
 interface IProps {
     name : string;
@@ -49,6 +51,7 @@ const TableForm = ({
     setStartDate,
     setEndDate
 }:IProps) => {
+    const langState = useSelector((state:RootState) => state.langReducer);
     const MENU_ID = "table-context-menu";
     const tableref = useRef(null);
 
@@ -111,12 +114,12 @@ const TableForm = ({
                     >
                         <Icon icon="search" size={24} />
                     </button>
-                    <Icon
+                    {/* <Icon
                         icon={isLookDown ? "doubleUp" : "doubleDown"}
                         size={30}
                         onClick={()=>setIsLookDown((prev) => !prev)}
                         className="look-down"
-                    />
+                    /> */}
                     <Icon
                         icon={isViewAll ? "minimize" : "expand"}
                         size={26}
@@ -146,13 +149,13 @@ const TableForm = ({
                     (<Item
                         onClick={()=>setIsViewAll(false)}
                     >
-                        축소하기
+                        {langState.isKor?"축소하기":"Narrow"}
                     </Item>)
                     :
                     (<Item
                         onClick={()=>setIsViewAll(true)}
                     >
-                        전체보기
+                        {langState.isKor?"넓히기":"Wide"}
                     </Item>)
                 }
 
@@ -166,7 +169,7 @@ const TableForm = ({
                         <span>액셀 다운로드</span>
                     </CSVLink> */}
                      <button onClick={()=>ExcelDownload()} className='excel-btn'>
-                        <span>엑셀 다운로드</span>
+                        <span>{langState.isKor? "엑셀 다운로드":"Excel Download" }</span>
                     </button>
                 </Item>
                 <Separator />

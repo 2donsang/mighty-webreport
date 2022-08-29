@@ -506,34 +506,6 @@ const PTESTYield = () => {
         return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
-    // useEffect(()=>{
-        
-    //     startTransition(()=>{
-    //         setTableBodies((
-    //             <tbody key={"bodies"}>
-    //             {searchData.map((element, index)=>(
-    //                 <React.Fragment key={"body"+index}>
-    //                     <tr>
-    //                         <td><span>{element.transTime}</span></td>
-    //                         <td><span>{element.device}</span></td>
-    //                         <td><span>{element.lotNumber}</span></td>
-    //                         <td><span>{element.waferId}</span></td>
-    //                         <td><span>{element.operation}</span></td>
-    //                         <td><span>{element.turn}</span></td>
-    //                         <td><span>{element.yield}</span></td>
-    //                         <td><span>{element.qtyTestDie}</span></td>
-    //                         <td><span>{element.qtyGoodDie}</span></td>
-    //                         <td><span>{element.qtyFailDie}</span></td>
-    //                         {/* <td><span>{ typeof element.testDate ==="string" && getMonthToMinute(getDate(element.testDate))}</span></td> */}
-    //                     </tr>
-    //                 </React.Fragment>
-    //             ))}
-    //             </tbody>
-    //         ))
-    //     })
-
-    // },[searchData])
-
     return (
         <S.Container
             isLookDown={isLookDown}
